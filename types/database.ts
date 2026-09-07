@@ -34,7 +34,7 @@ export interface Project {
   role: string;
   technologies: string[];
   status: ProjectStatus;
-  thumbnail: string;
+  thumbnail?: string;
   imagePath?: string;
   thumbnailPath?: string;
   screenshots: ProjectScreenshot[];
@@ -48,7 +48,7 @@ export interface Project {
 export interface Artwork {
   slug: string;
   title: string;
-  image: string;
+  image?: string;
   imagePath?: string;
   thumbnailPath?: string;
   publishedAt: string;

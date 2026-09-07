@@ -41,6 +41,23 @@ export async function getPublishedArtworks(): Promise<Artwork[]> {
     );
 }
 
+export async function getPublishedArtworksBySlugs(
+  slugs: string[],
+): Promise<Artwork[]> {
+  if (slugs.length === 0) {
+    return [];
+  }
+
+  const artworks = await getPublishedArtworks();
+  const artworksBySlug = new Map(
+    artworks.map((artwork) => [artwork.slug, artwork]),
+  );
+
+  return slugs
+    .map((slug) => artworksBySlug.get(slug))
+    .filter((artwork): artwork is Artwork => artwork !== undefined);
+}
+
 export async function getPublishedArtworkBySlug(
   slug: string,
 ): Promise<Artwork | null> {

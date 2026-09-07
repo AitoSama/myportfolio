@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import WindowFrame from "@/components/WindowFrame";
-import { getProject } from "@/lib/data";
 import { getPublishedArtworkBySlug } from "@/lib/data-access/artworks";
+import { getPublishedProjectsBySlugs } from "@/lib/data-access/projects";
 import { resolveArtworkMedia } from "@/lib/public-media";
 
 export const dynamic = "force-dynamic";
@@ -19,9 +19,7 @@ export default async function ArtworkDetail({ params }: { params: Promise<{ slug
 
     const artwork = await resolveArtworkMedia(artworkRecord, ["image"]);
 
-    const relatedProjects = (artwork.relatedProjects ?? [])
-        .map((projectSlug) => getProject(projectSlug))
-        .filter((project) => project !== undefined);
+    const relatedProjects = await getPublishedProjectsBySlugs(artwork.relatedProjects);
 
     return (
         <div className="min-h-screen pt-24 pb-20 container mx-auto px-6 max-w-5xl">

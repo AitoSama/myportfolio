@@ -68,7 +68,7 @@ function toFormState(project?: Project | null): ProjectFormState {
     role: project.role,
     technologies: project.technologies.join(", "),
     status: project.status,
-    thumbnail: project.thumbnail,
+    thumbnail: project.thumbnail ?? "",
     imagePath: project.imagePath ?? "",
     thumbnailPath: project.thumbnailPath ?? "",
     screenshots: project.screenshots.map((screenshot) => screenshot.url).join("\n"),
@@ -128,7 +128,7 @@ function validateForm(form: ProjectFormState): string | null {
     return `Please provide a ${missingField[0]}.`;
   }
 
-  if (!form.thumbnail.trim()) {
+  if (!form.thumbnail.trim() && !form.imagePath.trim()) {
     return "Provide a thumbnail URL or select a primary image file.";
   }
 

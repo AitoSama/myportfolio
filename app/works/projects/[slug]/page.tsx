@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, ExternalLink, Github, Layers, Tag } from "lucide-react";
 import WindowFrame from "@/components/WindowFrame";
-import { getArtwork } from "@/lib/data";
 import { getPublishedProjectBySlug } from "@/lib/data-access/projects";
+import { getPublishedArtworksBySlugs } from "@/lib/data-access/artworks";
 import { resolveProjectMedia } from "@/lib/public-media";
 
 export default async function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
@@ -17,9 +17,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
 
     const project = await resolveProjectMedia(projectRecord, ["image"]);
 
-    const relatedArtwork = (project.relatedArtwork ?? [])
-        .map((artworkSlug) => getArtwork(artworkSlug))
-        .filter((artwork) => artwork !== undefined);
+    const relatedArtwork = await getPublishedArtworksBySlugs(project.relatedArtwork);
 
     return (
         <div className="min-h-screen pt-24 pb-20 container mx-auto px-6 max-w-5xl">

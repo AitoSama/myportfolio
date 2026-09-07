@@ -39,6 +39,23 @@ export async function getPublishedProjects(): Promise<Project[]> {
     .sort((first, second) => second.date.localeCompare(first.date));
 }
 
+export async function getPublishedProjectsBySlugs(
+  slugs: string[],
+): Promise<Project[]> {
+  if (slugs.length === 0) {
+    return [];
+  }
+
+  const projects = await getPublishedProjects();
+  const projectsBySlug = new Map(
+    projects.map((project) => [project.slug, project]),
+  );
+
+  return slugs
+    .map((slug) => projectsBySlug.get(slug))
+    .filter((project): project is Project => project !== undefined);
+}
+
 export async function getPublishedProjectBySlug(
   slug: string,
 ): Promise<Project | null> {

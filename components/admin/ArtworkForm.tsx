@@ -83,7 +83,7 @@ function toFormState(artwork?: Artwork | null): ArtworkFormState {
   return {
     slug: artwork.slug,
     title: artwork.title,
-    image: artwork.image,
+    image: artwork.image ?? "",
     imagePath: artwork.imagePath ?? "",
     thumbnailPath: artwork.thumbnailPath ?? "",
     publishedAt: artwork.publishedAt,
@@ -139,7 +139,7 @@ function validateForm(form: ArtworkFormState): string | null {
     return `Please provide a ${missingField[0]}.`;
   }
 
-  if (!form.image.trim()) {
+  if (!form.image.trim() && !form.imagePath.trim()) {
     return "Provide an image URL or select a primary image file.";
   }
 

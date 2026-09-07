@@ -29,7 +29,10 @@ export async function resolveProjectMedia(
   variants: MediaVariant[] = ["image", "thumbnail"],
 ): Promise<ResolvedProject> {
   const [imageUrl, thumbnailUrl] = await Promise.all([
-    variants.includes("image") ? resolveMediaUrl(project.imagePath) : undefined,
+    variants.includes("image") ||
+    (variants.includes("thumbnail") && !project.thumbnailPath)
+      ? resolveMediaUrl(project.imagePath)
+      : undefined,
     variants.includes("thumbnail")
       ? resolveMediaUrl(project.thumbnailPath)
       : undefined,
@@ -48,7 +51,10 @@ export async function resolveArtworkMedia(
   variants: MediaVariant[] = ["image", "thumbnail"],
 ): Promise<ResolvedArtwork> {
   const [imageUrl, thumbnailUrl] = await Promise.all([
-    variants.includes("image") ? resolveMediaUrl(artwork.imagePath) : undefined,
+    variants.includes("image") ||
+    (variants.includes("thumbnail") && !artwork.thumbnailPath)
+      ? resolveMediaUrl(artwork.imagePath)
+      : undefined,
     variants.includes("thumbnail")
       ? resolveMediaUrl(artwork.thumbnailPath)
       : undefined,
