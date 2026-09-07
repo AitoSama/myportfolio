@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AdminGuard from "@/components/admin/AdminGuard";
+import DeleteConfirmationDialog from "@/components/admin/DeleteConfirmationDialog";
 import ProjectForm from "@/components/admin/ProjectForm";
 import {
   createProject,
@@ -27,6 +28,7 @@ export default function AdminProjectsPage() {
 function ProjectsManager() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,11 +101,12 @@ function ProjectsManager() {
     }
   };
 
-  const handleDelete = async (project: Project) => {
-    if (!window.confirm(`Delete project "${project.title}"? This cannot be undone.`)) {
+  const handleDelete = async () => {
+    if (!projectToDelete) {
       return;
     }
 
+    const project = projectToDelete;
     setDeletingSlug(project.slug);
     setOperationError(null);
     setNotice(null);
@@ -114,6 +117,7 @@ function ProjectsManager() {
         current.filter((item) => item.slug !== project.slug),
       );
       setNotice("Project deleted successfully.");
+      setProjectToDelete(null);
     } catch (error) {
       console.error("Deleting project failed:", error);
       setOperationError("The project could not be deleted. Please try again.");
@@ -146,7 +150,7 @@ function ProjectsManager() {
       </div>
 
       {notice ? (
-        <p role="status" className="mt-6 text-sm text-emerald-700">
+        <p role="status" aria-live="polite" className="mt-6 text-sm text-emerald-700">
           {notice}
         </p>
       ) : null}
@@ -167,7 +171,7 @@ function ProjectsManager() {
           />
         </div>
       ) : (
-        <section className="mt-8">
+        <section className="mt-8" aria-busy={isLoading}>
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading projects...</p>
           ) : loadError ? (
@@ -184,8 +188,17 @@ function ProjectsManager() {
               </button>
             </div>
           ) : projects.length === 0 ? (
-            <div className="border border-dashed border-border p-8 text-sm text-muted-foreground">
-              No projects found. Create the first project to begin.
+            <div className="border border-dashed border-border p-8">
+              <p className="text-sm text-muted-foreground">
+                No projects found. Create the first project to begin.
+              </p>
+              <button
+                type="button"
+                onClick={openCreateForm}
+                className="mt-4 border border-foreground bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-80"
+              >
+                Create your first project
+              </button>
             </div>
           ) : (
             <div className="overflow-x-auto border border-border">
@@ -218,7 +231,7 @@ function ProjectsManager() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => void handleDelete(project)}
+                            onClick={() => setProjectToDelete(project)}
                             disabled={deletingSlug !== null}
                             className="border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground disabled:cursor-not-allowed disabled:opacity-50"
                           >
@@ -234,6 +247,15 @@ function ProjectsManager() {
           )}
         </section>
       )}
+      {projectToDelete ? (
+        <DeleteConfirmationDialog
+          itemType="project"
+          title={projectToDelete.title}
+          isDeleting={deletingSlug === projectToDelete.slug}
+          onCancel={() => setProjectToDelete(null)}
+          onConfirm={() => void handleDelete()}
+        />
+      ) : null}
     </div>
   );
 }

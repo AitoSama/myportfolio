@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import AdminGuard from "@/components/admin/AdminGuard";
 import ArtworkForm from "@/components/admin/ArtworkForm";
+import DeleteConfirmationDialog from "@/components/admin/DeleteConfirmationDialog";
 import {
   createArtwork,
   deleteArtwork,
@@ -27,6 +28,7 @@ export default function AdminArtworksPage() {
 function ArtworksManager() {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [editingArtwork, setEditingArtwork] = useState<Artwork | null>(null);
+  const [artworkToDelete, setArtworkToDelete] = useState<Artwork | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,11 +101,12 @@ function ArtworksManager() {
     }
   };
 
-  const handleDelete = async (artwork: Artwork) => {
-    if (!window.confirm(`Delete artwork "${artwork.title}"? This cannot be undone.`)) {
+  const handleDelete = async () => {
+    if (!artworkToDelete) {
       return;
     }
 
+    const artwork = artworkToDelete;
     setDeletingSlug(artwork.slug);
     setOperationError(null);
     setNotice(null);
@@ -114,6 +117,7 @@ function ArtworksManager() {
         current.filter((item) => item.slug !== artwork.slug),
       );
       setNotice("Artwork deleted successfully.");
+      setArtworkToDelete(null);
     } catch (error) {
       console.error("Deleting artwork failed:", error);
       setOperationError("The artwork could not be deleted. Please try again.");
@@ -146,7 +150,7 @@ function ArtworksManager() {
       </div>
 
       {notice ? (
-        <p role="status" className="mt-6 text-sm text-emerald-700">
+        <p role="status" aria-live="polite" className="mt-6 text-sm text-emerald-700">
           {notice}
         </p>
       ) : null}
@@ -167,7 +171,7 @@ function ArtworksManager() {
           />
         </div>
       ) : (
-        <section className="mt-8">
+        <section className="mt-8" aria-busy={isLoading}>
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading artworks...</p>
           ) : loadError ? (
@@ -184,8 +188,17 @@ function ArtworksManager() {
               </button>
             </div>
           ) : artworks.length === 0 ? (
-            <div className="border border-dashed border-border p-8 text-sm text-muted-foreground">
-              No artworks found. Create the first artwork to begin.
+            <div className="border border-dashed border-border p-8">
+              <p className="text-sm text-muted-foreground">
+                No artworks found. Create the first artwork to begin.
+              </p>
+              <button
+                type="button"
+                onClick={openCreateForm}
+                className="mt-4 border border-foreground bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-80"
+              >
+                Create your first artwork
+              </button>
             </div>
           ) : (
             <div className="overflow-x-auto border border-border">
@@ -222,7 +235,7 @@ function ArtworksManager() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => void handleDelete(artwork)}
+                            onClick={() => setArtworkToDelete(artwork)}
                             disabled={deletingSlug !== null}
                             className="border border-destructive px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive hover:text-destructive-foreground disabled:cursor-not-allowed disabled:opacity-50"
                           >
@@ -238,6 +251,15 @@ function ArtworksManager() {
           )}
         </section>
       )}
+      {artworkToDelete ? (
+        <DeleteConfirmationDialog
+          itemType="artwork"
+          title={artworkToDelete.title}
+          isDeleting={deletingSlug === artworkToDelete.slug}
+          onCancel={() => setArtworkToDelete(null)}
+          onConfirm={() => void handleDelete()}
+        />
+      ) : null}
     </div>
   );
 }
