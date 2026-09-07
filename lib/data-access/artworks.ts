@@ -11,6 +11,11 @@ import {
 } from "firebase/firestore";
 import type { Artwork } from "@/types/database";
 import {
+  deleteExclusivelyOwnedMedia,
+  getStoragePaths,
+  MediaCleanupError,
+} from "@/lib/data-access/media";
+import {
   artworksCollection,
   mapArtwork,
 } from "@/lib/data-access/shared";
@@ -108,13 +113,58 @@ export async function updateArtwork(
     throw new Error("Artwork slug cannot be changed during an update.");
   }
 
+  const existingDocument = await getDoc(artworkDocument(slug));
+  const previousPaths = existingDocument.exists()
+    ? getStoragePaths(existingDocument.data())
+    : [];
+
   assertArtworkSlug(slug);
   await updateDoc(artworkDocument(slug), {
     ...artwork,
     updatedAt: serverTimestamp(),
   });
+
+  const currentPaths = new Set(getStoragePaths(artwork));
+  try {
+    await deleteExclusivelyOwnedMedia(
+      "artworks",
+      slug,
+      previousPaths.filter((path) => !currentPaths.has(path)),
+    );
+  } catch (error) {
+    if (error instanceof MediaCleanupError) {
+      throw new MediaCleanupError(
+        error.failedPaths,
+        "Artwork updated, but storage cleanup",
+        true,
+      );
+    }
+
+    throw error;
+  }
 }
 
 export async function deleteArtwork(slug: string): Promise<void> {
+  const document = await getDoc(artworkDocument(slug));
+
+  if (!document.exists()) {
+    return;
+  }
+
+  const paths = getStoragePaths(document.data());
   await deleteDoc(artworkDocument(slug));
+
+  try {
+    await deleteExclusivelyOwnedMedia("artworks", slug, paths);
+  } catch (error) {
+    if (error instanceof MediaCleanupError) {
+      throw new MediaCleanupError(
+        error.failedPaths,
+        "Artwork deleted, but storage cleanup",
+        true,
+      );
+    }
+
+    throw error;
+  }
 }

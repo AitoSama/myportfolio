@@ -18,6 +18,7 @@ import {
   uploadPortfolioMediaSelection,
   type MediaSelection,
 } from "@/lib/storage";
+import { MediaCleanupError } from "@/lib/data-access/media";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -115,24 +116,23 @@ function ProjectsManager() {
       }
       saved = true;
 
-      const replacedPaths = [
-        media.image && editingProject?.imagePath,
-        media.thumbnail && editingProject?.thumbnailPath,
-      ].filter((path): path is string => Boolean(path));
-
-      const cleanupResults = await Promise.allSettled(
-        replacedPaths.map((path) => deletePortfolioMedia(path)),
-      );
-      if (cleanupResults.some((result) => result.status === "rejected")) {
-        setNotice("Project saved, but an older image could not be removed.");
-      }
-
       closeForm();
       await loadProjects();
     } catch (error) {
-      if (!saved) {
+      const mutationCompleted =
+        error instanceof MediaCleanupError && error.recordMutationCompleted;
+      if (!saved && !mutationCompleted) {
+        const existingPaths = new Set(
+          [editingProject?.imagePath, editingProject?.thumbnailPath].filter(
+            (path): path is string => Boolean(path),
+          ),
+        );
         const cleanupResults = await Promise.allSettled(
-          Object.values(uploadedPaths).map((path) => deletePortfolioMedia(path)),
+          Object.values(uploadedPaths)
+            .filter(
+              (path): path is string => Boolean(path) && !existingPaths.has(path),
+            )
+            .map((path) => deletePortfolioMedia(path)),
         );
         if (cleanupResults.some((result) => result.status === "rejected")) {
           setOperationError(
@@ -141,6 +141,7 @@ function ProjectsManager() {
           return;
         }
       }
+      saved = saved || mutationCompleted;
       console.error("Saving project failed:", error);
       setSubmitStatus(null);
       setOperationError(
@@ -170,7 +171,9 @@ function ProjectsManager() {
       setProjectToDelete(null);
     } catch (error) {
       console.error("Deleting project failed:", error);
-      setOperationError("The project could not be deleted. Please try again.");
+      setOperationError(
+        getErrorMessage(error, "The project could not be deleted. Please try again."),
+      );
     } finally {
       setDeletingSlug(null);
     }

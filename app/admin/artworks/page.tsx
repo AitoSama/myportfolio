@@ -18,6 +18,7 @@ import {
   uploadPortfolioMediaSelection,
   type MediaSelection,
 } from "@/lib/storage";
+import { MediaCleanupError } from "@/lib/data-access/media";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -115,24 +116,23 @@ function ArtworksManager() {
       }
       saved = true;
 
-      const replacedPaths = [
-        media.image && editingArtwork?.imagePath,
-        media.thumbnail && editingArtwork?.thumbnailPath,
-      ].filter((path): path is string => Boolean(path));
-
-      const cleanupResults = await Promise.allSettled(
-        replacedPaths.map((path) => deletePortfolioMedia(path)),
-      );
-      if (cleanupResults.some((result) => result.status === "rejected")) {
-        setNotice("Artwork saved, but an older image could not be removed.");
-      }
-
       closeForm();
       await loadArtworks();
     } catch (error) {
-      if (!saved) {
+      const mutationCompleted =
+        error instanceof MediaCleanupError && error.recordMutationCompleted;
+      if (!saved && !mutationCompleted) {
+        const existingPaths = new Set(
+          [editingArtwork?.imagePath, editingArtwork?.thumbnailPath].filter(
+            (path): path is string => Boolean(path),
+          ),
+        );
         const cleanupResults = await Promise.allSettled(
-          Object.values(uploadedPaths).map((path) => deletePortfolioMedia(path)),
+          Object.values(uploadedPaths)
+            .filter(
+              (path): path is string => Boolean(path) && !existingPaths.has(path),
+            )
+            .map((path) => deletePortfolioMedia(path)),
         );
         if (cleanupResults.some((result) => result.status === "rejected")) {
           setOperationError(
@@ -141,6 +141,7 @@ function ArtworksManager() {
           return;
         }
       }
+      saved = saved || mutationCompleted;
       console.error("Saving artwork failed:", error);
       setSubmitStatus(null);
       setOperationError(
@@ -170,7 +171,9 @@ function ArtworksManager() {
       setArtworkToDelete(null);
     } catch (error) {
       console.error("Deleting artwork failed:", error);
-      setOperationError("The artwork could not be deleted. Please try again.");
+      setOperationError(
+        getErrorMessage(error, "The artwork could not be deleted. Please try again."),
+      );
     } finally {
       setDeletingSlug(null);
     }

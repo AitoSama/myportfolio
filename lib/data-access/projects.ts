@@ -11,6 +11,11 @@ import {
 } from "firebase/firestore";
 import type { Project } from "@/types/database";
 import {
+  deleteExclusivelyOwnedMedia,
+  getStoragePaths,
+  MediaCleanupError,
+} from "@/lib/data-access/media";
+import {
   mapProject,
   projectsCollection,
 } from "@/lib/data-access/shared";
@@ -104,13 +109,58 @@ export async function updateProject(
     throw new Error("Project slug cannot be changed during an update.");
   }
 
+  const existingDocument = await getDoc(projectDocument(slug));
+  const previousPaths = existingDocument.exists()
+    ? getStoragePaths(existingDocument.data())
+    : [];
+
   assertProjectSlug(slug);
   await updateDoc(projectDocument(slug), {
     ...project,
     updatedAt: serverTimestamp(),
   });
+
+  const currentPaths = new Set(getStoragePaths(project));
+  try {
+    await deleteExclusivelyOwnedMedia(
+      "projects",
+      slug,
+      previousPaths.filter((path) => !currentPaths.has(path)),
+    );
+  } catch (error) {
+    if (error instanceof MediaCleanupError) {
+      throw new MediaCleanupError(
+        error.failedPaths,
+        "Project updated, but storage cleanup",
+        true,
+      );
+    }
+
+    throw error;
+  }
 }
 
 export async function deleteProject(slug: string): Promise<void> {
+  const document = await getDoc(projectDocument(slug));
+
+  if (!document.exists()) {
+    return;
+  }
+
+  const paths = getStoragePaths(document.data());
   await deleteDoc(projectDocument(slug));
+
+  try {
+    await deleteExclusivelyOwnedMedia("projects", slug, paths);
+  } catch (error) {
+    if (error instanceof MediaCleanupError) {
+      throw new MediaCleanupError(
+        error.failedPaths,
+        "Project deleted, but storage cleanup",
+        true,
+      );
+    }
+
+    throw error;
+  }
 }
