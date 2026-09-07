@@ -40,7 +40,7 @@ service cloud.firestore {
     match /projects/{projectId} {
       // Public queries must include where('status', '==', 'published').
       // Rules are not filters, so an unconstrained query will be rejected.
-      allow read: if resource.data.status == 'published';
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow create, update: if isAdmin() && isValidProject(projectId);
       allow delete: if isAdmin();
     }
@@ -48,7 +48,7 @@ service cloud.firestore {
     match /artworks/{artworkId} {
       // Public queries must include where('status', '==', 'published').
       // Rules are not filters, so an unconstrained query will be rejected.
-      allow read: if resource.data.status == 'published';
+      allow read: if resource.data.status == 'published' || isAdmin();
       allow create, update: if isAdmin() && isValidArtwork(artworkId);
       allow delete: if isAdmin();
     }

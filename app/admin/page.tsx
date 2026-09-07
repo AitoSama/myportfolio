@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import AdminGuard from "@/components/admin/AdminGuard";
 
 export default function AdminPage() {
@@ -14,6 +15,12 @@ export default function AdminPage() {
           <p className="mt-3 text-sm text-muted-foreground">
             Authentication and authorization are configured.
           </p>
+          <Link
+            href="/admin/projects"
+            className="mt-6 inline-block border border-foreground bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-80"
+          >
+            Manage projects
+          </Link>
         </section>
       </div>
     </AdminGuard>
