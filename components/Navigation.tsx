@@ -29,6 +29,9 @@ export default function Navigation() {
                         <Link
                             key={link.href}
                             href={link.href}
+                            aria-current={link.href === "/works"
+                                ? pathname.startsWith("/works") ? "page" : undefined
+                                : pathname === link.href ? "page" : undefined}
                             className={cn(
                                 "font-mono text-sm uppercase tracking-wide transition-colors hover:text-foreground",
                                 link.href === "/works"
@@ -61,6 +64,9 @@ export default function Navigation() {
                                 key={link.href}
                                 href={link.href}
                                 onClick={() => setMenuOpen(false)}
+                                aria-current={link.href === "/works"
+                                    ? pathname.startsWith("/works") ? "page" : undefined
+                                    : pathname === link.href ? "page" : undefined}
                                 className={cn(
                                     "font-mono text-sm uppercase tracking-wide transition-colors hover:text-foreground",
                                     link.href === "/works"

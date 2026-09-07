@@ -45,7 +45,7 @@ export default function Contact() {
                         <label className="font-mono text-xs uppercase font-bold text-gray-500">To:</label>
                         <div className="flex items-center justify-between p-3 border border-gray-200 bg-gray-50 font-mono text-sm">
                             <span>{email}</span>
-                            <button onClick={copyEmail} className="hover:bg-gray-200 p-1 rounded transition-colors" title="Copy Email">
+                            <button type="button" onClick={copyEmail} aria-label="Copy email address" className="hover:bg-gray-200 p-1 rounded transition-colors" title="Copy Email">
                                 <Copy className="w-4 h-4" />
                             </button>
                         </div>
@@ -59,7 +59,7 @@ export default function Contact() {
                                 type="text"
                                 required
                                 placeholder="Project Inquiry..."
-                                className="w-full p-3 border border-gray-200 focus:outline-none focus:border-black transition-colors font-sans"
+                                className="w-full p-3 border border-gray-200 focus:border-black transition-colors font-sans"
                             />
                         </div>
 
@@ -70,7 +70,7 @@ export default function Contact() {
                                 rows={6}
                                 required
                                 placeholder="Tell me about your idea..."
-                                className="w-full p-3 border border-gray-200 focus:outline-none focus:border-black transition-colors font-sans resize-none"
+                                className="w-full p-3 border border-gray-200 focus:border-black transition-colors font-sans resize-none"
                             />
                         </div>
 

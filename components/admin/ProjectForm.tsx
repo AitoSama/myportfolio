@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import MediaFileInput from "@/components/admin/MediaFileInput";
 import type { Project, ProjectStatus } from "@/types/database";
 import type { ProjectInput } from "@/lib/data-access/projects";
@@ -152,6 +152,13 @@ export default function ProjectForm({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const isEditing = Boolean(project);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (validationError || error) {
+      errorRef.current?.focus();
+    }
+  }, [error, validationError]);
 
   const updateField = <Field extends keyof ProjectFormState>(
     field: Field,
@@ -190,7 +197,12 @@ export default function ProjectForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 border border-border bg-card p-6">
+    <form
+      onSubmit={handleSubmit}
+      aria-busy={isSubmitting}
+      aria-describedby={validationError || error ? "project-form-error" : undefined}
+      className="space-y-5 border border-border bg-card p-6"
+    >
       <div>
         <h2 className="text-xl font-semibold">{isEditing ? "Edit project" : "Create project"}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -395,7 +407,7 @@ export default function ProjectForm({
       </label>
 
       {validationError || error ? (
-        <p role="alert" className="text-sm text-destructive">
+        <p ref={errorRef} id="project-form-error" tabIndex={-1} role="alert" className="text-sm text-destructive">
           {validationError || error}
         </p>
       ) : null}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import MediaFileInput from "@/components/admin/MediaFileInput";
 import type {
   Artwork,
@@ -163,6 +163,13 @@ export default function ArtworkForm({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const isEditing = Boolean(artwork);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (validationError || error) {
+      errorRef.current?.focus();
+    }
+  }, [error, validationError]);
 
   const updateField = <Field extends keyof ArtworkFormState>(
     field: Field,
@@ -203,6 +210,8 @@ export default function ArtworkForm({
   return (
     <form
       onSubmit={handleSubmit}
+      aria-busy={isSubmitting}
+      aria-describedby={validationError || error ? "artwork-form-error" : undefined}
       className="space-y-5 border border-border bg-card p-6"
     >
       <div>
@@ -420,7 +429,7 @@ export default function ArtworkForm({
       </label>
 
       {validationError || error ? (
-        <p role="alert" className="text-sm text-destructive">
+        <p ref={errorRef} id="artwork-form-error" tabIndex={-1} role="alert" className="text-sm text-destructive">
           {validationError || error}
         </p>
       ) : null}

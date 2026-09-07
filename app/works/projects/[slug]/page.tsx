@@ -56,7 +56,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                             <div className="md:col-span-2 space-y-6">
-                                <h3 className="font-bold text-xl">About the Project</h3>
+                                <h2 className="font-bold text-xl">About the Project</h2>
                                 <p className="text-muted-foreground leading-relaxed">{project.description ?? project.shortDescription}</p>
                                 {project.screenshots && project.screenshots.length > 0 && (
                                     <div className="grid gap-4">

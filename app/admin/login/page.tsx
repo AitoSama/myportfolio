@@ -63,7 +63,7 @@ function LoginContent() {
         </p>
 
         {loading ? (
-          <p className="mt-8 text-sm text-muted-foreground">
+          <p role="status" aria-live="polite" className="mt-8 text-sm text-muted-foreground">
             Restoring authentication state...
           </p>
         ) : currentUser ? (
@@ -83,6 +83,7 @@ function LoginContent() {
               type="button"
               onClick={handleSignOut}
               disabled={isSigningOut}
+              aria-busy={isSigningOut}
               className="w-full border border-foreground px-4 py-3 text-sm font-medium transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSigningOut ? "Signing out..." : "Sign out"}
@@ -93,6 +94,7 @@ function LoginContent() {
             type="button"
             onClick={handleSignIn}
             disabled={isSigningIn}
+            aria-busy={isSigningIn}
             className="mt-8 flex w-full items-center justify-center gap-3 border border-foreground px-4 py-3 text-sm font-medium transition-colors hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSigningIn ? "Connecting to Google..." : "Continue with Google"}

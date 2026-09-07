@@ -50,7 +50,7 @@ export default function About() {
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="font-mono text-sm font-bold uppercase border-b border-black pb-2">Technical Arsenal</h3>
+                        <h2 className="font-mono text-sm font-bold uppercase border-b border-black pb-2">Technical Arsenal</h2>
                         <div className="flex flex-wrap gap-2">
                             {["React", "TypeScript", "Next.js", "WebGL", "Three.js", "Tailwind", "Framer Motion", "Node.js"].map(skill => (
                                 <span key={skill} className="px-3 py-1 bg-gray-100 border border-gray-200 text-sm font-mono hover:bg-black hover:text-white transition-colors cursor-default">
@@ -61,7 +61,7 @@ export default function About() {
                     </div>
 
                     <div className="space-y-4">
-                        <h3 className="font-mono text-sm font-bold uppercase border-b border-black pb-2">Creative Arsenal</h3>
+                        <h2 className="font-mono text-sm font-bold uppercase border-b border-black pb-2">Creative Arsenal</h2>
                         <div className="flex flex-wrap gap-2">
                             {["UI/UX Design", "Illustration", "Motion Graphics", "3D Modeling", "Generative Art"].map(skill => (
                                 <span key={skill} className="px-3 py-1 bg-gray-100 border border-gray-200 text-sm font-mono hover:bg-black hover:text-white transition-colors cursor-default">
