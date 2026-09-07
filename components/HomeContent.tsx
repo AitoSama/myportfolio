@@ -6,10 +6,10 @@ import { ArrowRight, Mail, Github, Twitter } from "lucide-react";
 import Link from "next/link";
 import WindowFrame from "@/components/WindowFrame";
 import { CONTACT, PROFILE, SOCIAL_LINKS } from "@/lib/data";
-import type { ResolvedProject } from "@/lib/public-media";
+import type { Project } from "@/types/database";
 
 interface HomeContentProps {
-    projects: ResolvedProject[];
+    projects: Project[];
     projectsUnavailable: boolean;
 }
 
@@ -66,6 +66,7 @@ export default function HomeContent({ projects, projectsUnavailable }: HomeConte
                             fill
                             sizes="(max-width: 1024px) 100vw, 42vw"
                             className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                            priority
                         />
                         <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm border border-black p-3 font-mono text-xs">
                             <div className="flex justify-between items-center">

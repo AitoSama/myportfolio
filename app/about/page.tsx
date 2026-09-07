@@ -22,6 +22,7 @@ export default function About() {
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
                                 className="w-full h-full object-cover grayscale opacity-90"
+                                priority
                             />
                             <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
                                 <p className="font-mono text-xs">LVL 24 CREATIVE DEV</p>

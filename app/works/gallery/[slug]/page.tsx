@@ -17,9 +17,10 @@ export default async function ArtworkDetail({ params }: { params: Promise<{ slug
         notFound();
     }
 
-    const artwork = await resolveArtworkMedia(artworkRecord, ["image"]);
-
-    const relatedProjects = await getPublishedProjectsBySlugs(artwork.relatedProjects);
+    const [artwork, relatedProjects] = await Promise.all([
+        resolveArtworkMedia(artworkRecord, ["image"]),
+        getPublishedProjectsBySlugs(artworkRecord.relatedProjects),
+    ]);
 
     return (
         <div className="min-h-screen pt-24 pb-20 container mx-auto px-6 max-w-5xl">
@@ -29,7 +30,7 @@ export default async function ArtworkDetail({ params }: { params: Promise<{ slug
             <div>
                 <WindowFrame title={`${artwork.title} - ARTWORK`}>
                     <div className="aspect-video w-full bg-gray-100 border-b border-black relative">
-                        {artwork.resolvedImageUrl ? <Image src={artwork.resolvedImageUrl} alt={artwork.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-contain" /> : <div className="w-full h-full flex items-center justify-center font-mono text-xs uppercase text-gray-500">Image unavailable</div>}
+                        {artwork.resolvedImageUrl ? <Image src={artwork.resolvedImageUrl} alt={artwork.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-contain" priority /> : <div className="w-full h-full flex items-center justify-center font-mono text-xs uppercase text-gray-500">Image unavailable</div>}
                     </div>
                     <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div className="md:col-span-2 space-y-6">

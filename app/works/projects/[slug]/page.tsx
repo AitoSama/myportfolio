@@ -15,9 +15,10 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
         notFound();
     }
 
-    const project = await resolveProjectMedia(projectRecord, ["image"]);
-
-    const relatedArtwork = await getPublishedArtworksBySlugs(project.relatedArtwork);
+    const [project, relatedArtwork] = await Promise.all([
+        resolveProjectMedia(projectRecord, ["image"]),
+        getPublishedArtworksBySlugs(projectRecord.relatedArtwork),
+    ]);
 
     return (
         <div className="min-h-screen pt-24 pb-20 container mx-auto px-6 max-w-5xl">
@@ -29,7 +30,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
                 <WindowFrame title={`${project.title} - READ_ONLY`} className="mb-12">
                     <div className="aspect-video w-full bg-gray-100 border-b border-black relative">
                         {project.resolvedImageUrl ? (
-                            <Image src={project.resolvedImageUrl} alt={project.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-cover" />
+                            <Image src={project.resolvedImageUrl} alt={project.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-cover" priority />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center font-mono text-xs uppercase text-gray-500">Image unavailable</div>
                         )}
@@ -60,7 +61,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
                                 <p className="text-muted-foreground leading-relaxed">{project.description ?? project.shortDescription}</p>
                                 {project.screenshots && project.screenshots.length > 0 && (
                                     <div className="grid gap-4">
-                                        {project.screenshots.map((screenshot) => <Image key={screenshot.url} src={screenshot.url} alt={`${project.title} screenshot`} width={1200} height={675} />)}
+                                        {project.screenshots.map((screenshot) => <Image key={screenshot.url} src={screenshot.url} alt={`${project.title} screenshot`} width={1200} height={675} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 66vw, 680px" />)}
                                     </div>
                                 )}
                                 {relatedArtwork.length > 0 && <p className="text-muted-foreground">Related artwork is available in the Gallery.</p>}
