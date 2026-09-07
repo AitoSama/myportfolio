@@ -12,6 +12,12 @@ import {
   type ArtworkInput,
 } from "@/lib/data-access/artworks";
 import type { Artwork } from "@/types/database";
+import {
+  deletePortfolioMedia,
+  getStorageDownloadUrl,
+  uploadPortfolioMediaSelection,
+  type MediaSelection,
+} from "@/lib/storage";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -75,23 +81,59 @@ function ArtworksManager() {
     setOperationError(null);
   };
 
-  const handleSubmit = async (artwork: ArtworkInput) => {
+  const handleSubmit = async (artwork: ArtworkInput, media: MediaSelection) => {
     setIsSubmitting(true);
     setOperationError(null);
     setNotice(null);
+    let uploadedPaths: Partial<Record<"image" | "thumbnail", string>> = {};
+    let saved = false;
 
     try {
+      uploadedPaths = await uploadPortfolioMediaSelection("artworks", artwork.slug, media);
+      const artworkWithMedia: ArtworkInput = {
+        ...artwork,
+        ...(uploadedPaths.image
+          ? { image: await getStorageDownloadUrl(uploadedPaths.image) }
+          : {}),
+        ...(uploadedPaths.image ? { imagePath: uploadedPaths.image } : {}),
+        ...(uploadedPaths.thumbnail ? { thumbnailPath: uploadedPaths.thumbnail } : {}),
+      };
+
       if (editingArtwork) {
-        await updateArtwork(editingArtwork.slug, artwork);
+        await updateArtwork(editingArtwork.slug, artworkWithMedia);
         setNotice("Artwork updated successfully.");
       } else {
-        await createArtwork(artwork);
+        await createArtwork(artworkWithMedia);
         setNotice("Artwork created successfully.");
+      }
+      saved = true;
+
+      const replacedPaths = [
+        media.image && editingArtwork?.imagePath,
+        media.thumbnail && editingArtwork?.thumbnailPath,
+      ].filter((path): path is string => Boolean(path));
+
+      const cleanupResults = await Promise.allSettled(
+        replacedPaths.map((path) => deletePortfolioMedia(path)),
+      );
+      if (cleanupResults.some((result) => result.status === "rejected")) {
+        setNotice("Artwork saved, but an older image could not be removed.");
       }
 
       closeForm();
       await loadArtworks();
     } catch (error) {
+      if (!saved) {
+        const cleanupResults = await Promise.allSettled(
+          Object.values(uploadedPaths).map((path) => deletePortfolioMedia(path)),
+        );
+        if (cleanupResults.some((result) => result.status === "rejected")) {
+          setOperationError(
+            "The artwork could not be saved, and temporary uploaded media could not be fully cleaned up.",
+          );
+          return;
+        }
+      }
       console.error("Saving artwork failed:", error);
       setOperationError(
         getErrorMessage(error, "The artwork could not be saved. Please try again."),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import MediaFileInput from "@/components/admin/MediaFileInput";
 import type {
   Artwork,
   ArtworkFormat,
@@ -8,12 +9,13 @@ import type {
   ArtworkType,
 } from "@/types/database";
 import type { ArtworkInput } from "@/lib/data-access/artworks";
+import type { MediaSelection } from "@/lib/storage";
 
 interface ArtworkFormProps {
   artwork?: Artwork | null;
   isSubmitting: boolean;
   error: string | null;
-  onSubmit: (artwork: ArtworkInput) => Promise<void>;
+  onSubmit: (artwork: ArtworkInput, media: MediaSelection) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -22,6 +24,7 @@ interface ArtworkFormState {
   title: string;
   image: string;
   imagePath: string;
+  thumbnailPath: string;
   publishedAt: string;
   description: string;
   format: ArtworkFormat;
@@ -58,6 +61,7 @@ const emptyForm: ArtworkFormState = {
   title: "",
   image: "",
   imagePath: "",
+  thumbnailPath: "",
   publishedAt: "",
   description: "",
   format: "Illustration",
@@ -80,6 +84,7 @@ function toFormState(artwork?: Artwork | null): ArtworkFormState {
     title: artwork.title,
     image: artwork.image,
     imagePath: artwork.imagePath ?? "",
+    thumbnailPath: artwork.thumbnailPath ?? "",
     publishedAt: artwork.publishedAt,
     description: artwork.description,
     format: artwork.format,
@@ -106,6 +111,7 @@ function toArtworkInput(form: ArtworkFormState): ArtworkInput {
     title: form.title.trim(),
     image: form.image.trim(),
     ...(form.imagePath.trim() ? { imagePath: form.imagePath.trim() } : {}),
+    ...(form.thumbnailPath.trim() ? { thumbnailPath: form.thumbnailPath.trim() } : {}),
     publishedAt: form.publishedAt.trim(),
     description: form.description.trim(),
     format: form.format,
@@ -123,7 +129,6 @@ function validateForm(form: ArtworkFormState): string | null {
   const requiredFields: Array<[string, string]> = [
     ["slug", form.slug],
     ["title", form.title],
-    ["image URL", form.image],
     ["published date", form.publishedAt],
     ["description", form.description],
   ];
@@ -131,6 +136,10 @@ function validateForm(form: ArtworkFormState): string | null {
 
   if (missingField) {
     return `Please provide a ${missingField[0]}.`;
+  }
+
+  if (!form.image.trim()) {
+    return "Provide an image URL or select a primary image file.";
   }
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.trim())) {
@@ -149,6 +158,8 @@ export default function ArtworkForm({
 }: ArtworkFormProps) {
   const [form, setForm] = useState(() => toFormState(artwork));
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const isEditing = Boolean(artwork);
 
   const updateField = <Field extends keyof ArtworkFormState>(
@@ -168,7 +179,23 @@ export default function ArtworkForm({
       return;
     }
 
-    await onSubmit(toArtworkInput(form));
+    await onSubmit(toArtworkInput(form), {
+      ...(imageFile ? { image: imageFile } : {}),
+      ...(thumbnailFile ? { thumbnail: thumbnailFile } : {}),
+    });
+  };
+
+  const handleMediaChange = (
+    field: "image" | "thumbnail",
+    file: File | null,
+    fileError: string | null,
+  ) => {
+    if (field === "image") {
+      setImageFile(fileError ? null : file);
+    } else {
+      setThumbnailFile(fileError ? null : file);
+    }
+    setValidationError(fileError);
   };
 
   return (
@@ -277,9 +304,8 @@ export default function ArtworkForm({
       </div>
 
       <label className="block space-y-2 text-sm">
-        <span>Image URL *</span>
+        <span>Image URL (optional when uploading)</span>
         <input
-          required
           type="url"
           value={form.image}
           onChange={(event) => updateField("image", event.target.value)}
@@ -293,6 +319,33 @@ export default function ArtworkForm({
         <input
           value={form.imagePath}
           onChange={(event) => updateField("imagePath", event.target.value)}
+          disabled={isSubmitting}
+          className="w-full border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+        />
+      </label>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        <MediaFileInput
+          label="Primary image file"
+          file={imageFile}
+          existingPath={form.imagePath}
+          disabled={isSubmitting}
+          onChange={(file, fileError) => handleMediaChange("image", file, fileError)}
+        />
+        <MediaFileInput
+          label="Thumbnail image file (optional)"
+          file={thumbnailFile}
+          existingPath={form.thumbnailPath}
+          disabled={isSubmitting}
+          onChange={(file, fileError) => handleMediaChange("thumbnail", file, fileError)}
+        />
+      </div>
+
+      <label className="block space-y-2 text-sm">
+        <span>Thumbnail storage path</span>
+        <input
+          value={form.thumbnailPath}
+          onChange={(event) => updateField("thumbnailPath", event.target.value)}
           disabled={isSubmitting}
           className="w-full border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
         />

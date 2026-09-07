@@ -35,6 +35,7 @@ export interface Project {
   technologies: string[];
   status: ProjectStatus;
   thumbnail: string;
+  imagePath?: string;
   thumbnailPath?: string;
   screenshots: ProjectScreenshot[];
   liveUrl?: string;
@@ -49,6 +50,7 @@ export interface Artwork {
   title: string;
   image: string;
   imagePath?: string;
+  thumbnailPath?: string;
   publishedAt: string;
   description: string;
   format: ArtworkFormat;

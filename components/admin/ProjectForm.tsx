@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import MediaFileInput from "@/components/admin/MediaFileInput";
 import type { Project, ProjectStatus } from "@/types/database";
 import type { ProjectInput } from "@/lib/data-access/projects";
+import type { MediaSelection } from "@/lib/storage";
 
 interface ProjectFormProps {
   project?: Project | null;
   isSubmitting: boolean;
   error: string | null;
-  onSubmit: (project: ProjectInput) => Promise<void>;
+  onSubmit: (project: ProjectInput, media: MediaSelection) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -23,6 +25,7 @@ interface ProjectFormState {
   technologies: string;
   status: ProjectStatus;
   thumbnail: string;
+  imagePath: string;
   thumbnailPath: string;
   screenshots: string;
   liveUrl: string;
@@ -41,6 +44,7 @@ const emptyForm: ProjectFormState = {
   technologies: "",
   status: "draft",
   thumbnail: "",
+  imagePath: "",
   thumbnailPath: "",
   screenshots: "",
   liveUrl: "",
@@ -64,6 +68,7 @@ function toFormState(project?: Project | null): ProjectFormState {
     technologies: project.technologies.join(", "),
     status: project.status,
     thumbnail: project.thumbnail,
+    imagePath: project.imagePath ?? "",
     thumbnailPath: project.thumbnailPath ?? "",
     screenshots: project.screenshots.map((screenshot) => screenshot.url).join("\n"),
     liveUrl: project.liveUrl ?? "",
@@ -91,6 +96,7 @@ function toProjectInput(form: ProjectFormState): ProjectInput {
     technologies: splitList(form.technologies),
     status: form.status,
     thumbnail: form.thumbnail.trim(),
+    ...(form.imagePath.trim() ? { imagePath: form.imagePath.trim() } : {}),
     ...(form.thumbnailPath.trim()
       ? { thumbnailPath: form.thumbnailPath.trim() }
       : {}),
@@ -114,12 +120,15 @@ function validateForm(form: ProjectFormState): string | null {
     ["date", form.date],
     ["category", form.category],
     ["role", form.role],
-    ["thumbnail URL", form.thumbnail],
   ];
   const missingField = requiredFields.find(([, value]) => !value.trim());
 
   if (missingField) {
     return `Please provide a ${missingField[0]}.`;
+  }
+
+  if (!form.thumbnail.trim()) {
+    return "Provide a thumbnail URL or select a primary image file.";
   }
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.trim())) {
@@ -138,6 +147,8 @@ export default function ProjectForm({
 }: ProjectFormProps) {
   const [form, setForm] = useState(() => toFormState(project));
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const isEditing = Boolean(project);
 
   const updateField = <Field extends keyof ProjectFormState>(
@@ -157,7 +168,23 @@ export default function ProjectForm({
       return;
     }
 
-    await onSubmit(toProjectInput(form));
+    await onSubmit(toProjectInput(form), {
+      ...(imageFile ? { image: imageFile } : {}),
+      ...(thumbnailFile ? { thumbnail: thumbnailFile } : {}),
+    });
+  };
+
+  const handleMediaChange = (
+    field: "image" | "thumbnail",
+    file: File | null,
+    fileError: string | null,
+  ) => {
+    if (field === "image") {
+      setImageFile(fileError ? null : file);
+    } else {
+      setThumbnailFile(fileError ? null : file);
+    }
+    setValidationError(fileError);
   };
 
   return (
@@ -267,9 +294,8 @@ export default function ProjectForm({
 
       <div className="grid gap-5 md:grid-cols-2">
         <label className="space-y-2 text-sm">
-          <span>Thumbnail URL *</span>
+          <span>Thumbnail URL (optional when uploading)</span>
           <input
-            required
             type="url"
             value={form.thumbnail}
             onChange={(event) => updateField("thumbnail", event.target.value)}
@@ -277,6 +303,29 @@ export default function ProjectForm({
             className="w-full border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
           />
         </label>
+        <MediaFileInput
+          label="Primary image file"
+          file={imageFile}
+          existingPath={form.imagePath}
+          disabled={isSubmitting}
+          onChange={(file, fileError) => handleMediaChange("image", file, fileError)}
+        />
+        <label className="space-y-2 text-sm">
+          <span>Primary image storage path</span>
+          <input
+            value={form.imagePath}
+            onChange={(event) => updateField("imagePath", event.target.value)}
+            disabled={isSubmitting}
+            className="w-full border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+          />
+        </label>
+        <MediaFileInput
+          label="Thumbnail image file (optional)"
+          file={thumbnailFile}
+          existingPath={form.thumbnailPath}
+          disabled={isSubmitting}
+          onChange={(file, fileError) => handleMediaChange("thumbnail", file, fileError)}
+        />
         <label className="space-y-2 text-sm">
           <span>Thumbnail storage path</span>
           <input

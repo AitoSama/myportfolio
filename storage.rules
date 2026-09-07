@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'a1t0samatt@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function isValidImageUpload() {
+      return request.resource != null
+        && request.resource.contentType.matches('image/(jpeg|png|webp|gif)')
+        && request.resource.size < 10 * 1024 * 1024;
+    }
+
+    match /projects/{projectSlug}/{mediaVariant} {
+      allow read: if mediaVariant in ['image', 'thumbnail']
+        && (isAdmin()
+          || firestore.get(
+            /databases/(default)/documents/projects/$(projectSlug)
+          ).data.status == 'published');
+      allow create, update: if isAdmin()
+        && mediaVariant in ['image', 'thumbnail']
+        && isValidImageUpload();
+      allow delete: if isAdmin()
+        && mediaVariant in ['image', 'thumbnail'];
+    }
+
+    match /artworks/{artworkSlug}/{mediaVariant} {
+      allow read: if mediaVariant in ['image', 'thumbnail']
+        && (isAdmin()
+          || firestore.get(
+            /databases/(default)/documents/artworks/$(artworkSlug)
+          ).data.status == 'published');
+      allow create, update: if isAdmin()
+        && mediaVariant in ['image', 'thumbnail']
+        && isValidImageUpload();
+      allow delete: if isAdmin()
+        && mediaVariant in ['image', 'thumbnail'];
+    }
+  }
+}

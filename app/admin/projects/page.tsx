@@ -12,6 +12,12 @@ import {
   type ProjectInput,
 } from "@/lib/data-access/projects";
 import type { Project } from "@/types/database";
+import {
+  deletePortfolioMedia,
+  getStorageDownloadUrl,
+  uploadPortfolioMediaSelection,
+  type MediaSelection,
+} from "@/lib/storage";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -75,23 +81,59 @@ function ProjectsManager() {
     setOperationError(null);
   };
 
-  const handleSubmit = async (project: ProjectInput) => {
+  const handleSubmit = async (project: ProjectInput, media: MediaSelection) => {
     setIsSubmitting(true);
     setOperationError(null);
     setNotice(null);
+    let uploadedPaths: Partial<Record<"image" | "thumbnail", string>> = {};
+    let saved = false;
 
     try {
+      uploadedPaths = await uploadPortfolioMediaSelection("projects", project.slug, media);
+      const projectWithMedia: ProjectInput = {
+        ...project,
+        ...(uploadedPaths.image
+          ? { thumbnail: await getStorageDownloadUrl(uploadedPaths.image) }
+          : {}),
+        ...(uploadedPaths.image ? { imagePath: uploadedPaths.image } : {}),
+        ...(uploadedPaths.thumbnail ? { thumbnailPath: uploadedPaths.thumbnail } : {}),
+      };
+
       if (editingProject) {
-        await updateProject(editingProject.slug, project);
+        await updateProject(editingProject.slug, projectWithMedia);
         setNotice("Project updated successfully.");
       } else {
-        await createProject(project);
+        await createProject(projectWithMedia);
         setNotice("Project created successfully.");
+      }
+      saved = true;
+
+      const replacedPaths = [
+        media.image && editingProject?.imagePath,
+        media.thumbnail && editingProject?.thumbnailPath,
+      ].filter((path): path is string => Boolean(path));
+
+      const cleanupResults = await Promise.allSettled(
+        replacedPaths.map((path) => deletePortfolioMedia(path)),
+      );
+      if (cleanupResults.some((result) => result.status === "rejected")) {
+        setNotice("Project saved, but an older image could not be removed.");
       }
 
       closeForm();
       await loadProjects();
     } catch (error) {
+      if (!saved) {
+        const cleanupResults = await Promise.allSettled(
+          Object.values(uploadedPaths).map((path) => deletePortfolioMedia(path)),
+        );
+        if (cleanupResults.some((result) => result.status === "rejected")) {
+          setOperationError(
+            "The project could not be saved, and temporary uploaded media could not be fully cleaned up.",
+          );
+          return;
+        }
+      }
       console.error("Saving project failed:", error);
       setOperationError(
         getErrorMessage(error, "The project could not be saved. Please try again."),

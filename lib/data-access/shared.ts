@@ -205,6 +205,9 @@ export function mapProject(
       "archived",
     ]),
     thumbnail: stringValue(reference, data, "thumbnail"),
+    ...(optionalStringValue(reference, data, "imagePath") === undefined
+      ? {}
+      : { imagePath: optionalStringValue(reference, data, "imagePath") }),
     ...(optionalStringValue(reference, data, "thumbnailPath") === undefined
       ? {}
       : { thumbnailPath: optionalStringValue(reference, data, "thumbnailPath") }),
@@ -240,6 +243,9 @@ export function mapArtwork(
     ...(optionalStringValue(reference, data, "imagePath") === undefined
       ? {}
       : { imagePath: optionalStringValue(reference, data, "imagePath") }),
+    ...(optionalStringValue(reference, data, "thumbnailPath") === undefined
+      ? {}
+      : { thumbnailPath: optionalStringValue(reference, data, "thumbnailPath") }),
     publishedAt: stringValue(reference, data, "publishedAt"),
     description: stringValue(reference, data, "description"),
     format: literalValue<ArtworkFormat>(reference, data, "format", [
