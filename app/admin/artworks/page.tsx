@@ -42,6 +42,7 @@ function ArtworksManager() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [operationError, setOperationError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [submitStatus, setSubmitStatus] = useState<string | null>(null);
 
   const loadArtworks = useCallback(async () => {
     setIsLoading(true);
@@ -65,6 +66,7 @@ function ArtworksManager() {
     setEditingArtwork(null);
     setOperationError(null);
     setNotice(null);
+    setSubmitStatus(null);
     setIsCreating(true);
   };
 
@@ -72,6 +74,7 @@ function ArtworksManager() {
     setEditingArtwork(artwork);
     setOperationError(null);
     setNotice(null);
+    setSubmitStatus(null);
     setIsCreating(false);
   };
 
@@ -79,16 +82,19 @@ function ArtworksManager() {
     setEditingArtwork(null);
     setIsCreating(false);
     setOperationError(null);
+    setSubmitStatus(null);
   };
 
   const handleSubmit = async (artwork: ArtworkInput, media: MediaSelection) => {
     setIsSubmitting(true);
     setOperationError(null);
     setNotice(null);
+    setSubmitStatus("Preparing media...");
     let uploadedPaths: Partial<Record<"image" | "thumbnail", string>> = {};
     let saved = false;
 
     try {
+      setSubmitStatus("Uploading media...");
       uploadedPaths = await uploadPortfolioMediaSelection("artworks", artwork.slug, media);
       const artworkWithMedia: ArtworkInput = {
         ...artwork,
@@ -99,6 +105,7 @@ function ArtworksManager() {
         ...(uploadedPaths.thumbnail ? { thumbnailPath: uploadedPaths.thumbnail } : {}),
       };
 
+      setSubmitStatus("Saving metadata...");
       if (editingArtwork) {
         await updateArtwork(editingArtwork.slug, artworkWithMedia);
         setNotice("Artwork updated successfully.");
@@ -135,6 +142,7 @@ function ArtworksManager() {
         }
       }
       console.error("Saving artwork failed:", error);
+      setSubmitStatus(null);
       setOperationError(
         getErrorMessage(error, "The artwork could not be saved. Please try again."),
       );
@@ -208,6 +216,7 @@ function ArtworksManager() {
             artwork={editingArtwork}
             isSubmitting={isSubmitting}
             error={operationError}
+            submitStatus={submitStatus}
             onSubmit={handleSubmit}
             onCancel={closeForm}
           />

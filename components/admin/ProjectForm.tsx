@@ -12,6 +12,7 @@ interface ProjectFormProps {
   error: string | null;
   onSubmit: (project: ProjectInput, media: MediaSelection) => Promise<void>;
   onCancel: () => void;
+  submitStatus?: string | null;
 }
 
 interface ProjectFormState {
@@ -144,6 +145,7 @@ export default function ProjectForm({
   error,
   onSubmit,
   onCancel,
+  submitStatus,
 }: ProjectFormProps) {
   const [form, setForm] = useState(() => toFormState(project));
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -307,6 +309,7 @@ export default function ProjectForm({
           label="Primary image file"
           file={imageFile}
           existingPath={form.imagePath}
+          existingUrl={form.thumbnail}
           disabled={isSubmitting}
           onChange={(file, fileError) => handleMediaChange("image", file, fileError)}
         />
@@ -394,6 +397,11 @@ export default function ProjectForm({
       {validationError || error ? (
         <p role="alert" className="text-sm text-destructive">
           {validationError || error}
+        </p>
+      ) : null}
+      {submitStatus ? (
+        <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+          {submitStatus}
         </p>
       ) : null}
 

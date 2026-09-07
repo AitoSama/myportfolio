@@ -17,6 +17,7 @@ interface ArtworkFormProps {
   error: string | null;
   onSubmit: (artwork: ArtworkInput, media: MediaSelection) => Promise<void>;
   onCancel: () => void;
+  submitStatus?: string | null;
 }
 
 interface ArtworkFormState {
@@ -155,6 +156,7 @@ export default function ArtworkForm({
   error,
   onSubmit,
   onCancel,
+  submitStatus,
 }: ArtworkFormProps) {
   const [form, setForm] = useState(() => toFormState(artwork));
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -329,6 +331,7 @@ export default function ArtworkForm({
           label="Primary image file"
           file={imageFile}
           existingPath={form.imagePath}
+          existingUrl={form.image}
           disabled={isSubmitting}
           onChange={(file, fileError) => handleMediaChange("image", file, fileError)}
         />
@@ -419,6 +422,11 @@ export default function ArtworkForm({
       {validationError || error ? (
         <p role="alert" className="text-sm text-destructive">
           {validationError || error}
+        </p>
+      ) : null}
+      {submitStatus ? (
+        <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
+          {submitStatus}
         </p>
       ) : null}
 

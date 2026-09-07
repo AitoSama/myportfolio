@@ -42,6 +42,7 @@ function ProjectsManager() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [operationError, setOperationError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [submitStatus, setSubmitStatus] = useState<string | null>(null);
 
   const loadProjects = useCallback(async () => {
     setIsLoading(true);
@@ -65,6 +66,7 @@ function ProjectsManager() {
     setEditingProject(null);
     setOperationError(null);
     setNotice(null);
+    setSubmitStatus(null);
     setIsCreating(true);
   };
 
@@ -72,6 +74,7 @@ function ProjectsManager() {
     setEditingProject(project);
     setOperationError(null);
     setNotice(null);
+    setSubmitStatus(null);
     setIsCreating(false);
   };
 
@@ -79,16 +82,19 @@ function ProjectsManager() {
     setEditingProject(null);
     setIsCreating(false);
     setOperationError(null);
+    setSubmitStatus(null);
   };
 
   const handleSubmit = async (project: ProjectInput, media: MediaSelection) => {
     setIsSubmitting(true);
     setOperationError(null);
     setNotice(null);
+    setSubmitStatus("Preparing media...");
     let uploadedPaths: Partial<Record<"image" | "thumbnail", string>> = {};
     let saved = false;
 
     try {
+      setSubmitStatus("Uploading media...");
       uploadedPaths = await uploadPortfolioMediaSelection("projects", project.slug, media);
       const projectWithMedia: ProjectInput = {
         ...project,
@@ -99,6 +105,7 @@ function ProjectsManager() {
         ...(uploadedPaths.thumbnail ? { thumbnailPath: uploadedPaths.thumbnail } : {}),
       };
 
+      setSubmitStatus("Saving metadata...");
       if (editingProject) {
         await updateProject(editingProject.slug, projectWithMedia);
         setNotice("Project updated successfully.");
@@ -135,6 +142,7 @@ function ProjectsManager() {
         }
       }
       console.error("Saving project failed:", error);
+      setSubmitStatus(null);
       setOperationError(
         getErrorMessage(error, "The project could not be saved. Please try again."),
       );
@@ -208,6 +216,7 @@ function ProjectsManager() {
             project={editingProject}
             isSubmitting={isSubmitting}
             error={operationError}
+            submitStatus={submitStatus}
             onSubmit={handleSubmit}
             onCancel={closeForm}
           />

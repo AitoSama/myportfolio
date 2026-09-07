@@ -8,6 +8,7 @@ interface MediaFileInputProps {
   label: string;
   file: File | null;
   existingPath?: string;
+  existingUrl?: string;
   disabled: boolean;
   onChange: (file: File | null, error: string | null) => void;
 }
@@ -24,11 +25,13 @@ export default function MediaFileInput({
   label,
   file,
   existingPath,
+  existingUrl,
   disabled,
   onChange,
 }: MediaFileInputProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const previewUrlRef = useRef<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -53,12 +56,25 @@ export default function MediaFileInput({
     onChange(nextFile, fileError);
   };
 
+  const clearSelection = () => {
+    if (previewUrlRef.current) {
+      URL.revokeObjectURL(previewUrlRef.current);
+      previewUrlRef.current = null;
+    }
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+    setPreviewUrl(null);
+    onChange(null, null);
+  };
+
   return (
     <div className="space-y-2 text-sm">
       <label className="block space-y-2">
         <span>{label}</span>
         <input
           type="file"
+          ref={inputRef}
           accept="image/jpeg,image/png,image/webp,image/gif"
           onChange={handleChange}
           disabled={disabled}
@@ -66,7 +82,7 @@ export default function MediaFileInput({
         />
       </label>
       {file ? (
-        <div className="flex gap-3 border border-border bg-background p-2">
+        <div className="flex items-start gap-3 border border-border bg-background p-2">
           {previewUrl ? (
             <Image
               src={previewUrl}
@@ -80,10 +96,32 @@ export default function MediaFileInput({
           <div className="min-w-0 text-xs text-muted-foreground">
             <p className="truncate font-medium text-foreground">{file.name}</p>
             <p>{file.type} · {formatFileSize(file.size)}</p>
+            <button
+              type="button"
+              onClick={clearSelection}
+              disabled={disabled}
+              className="mt-2 border border-border px-2 py-1 font-mono text-[10px] uppercase hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Clear selection
+            </button>
+          </div>
+        </div>
+      ) : existingUrl ? (
+        <div className="flex gap-3 border border-border bg-background p-2">
+          <Image
+            src={existingUrl}
+            alt={`Current ${label.toLowerCase()}`}
+            width={64}
+            height={64}
+            className="h-16 w-16 object-cover"
+          />
+          <div className="min-w-0 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground">Current image</p>
+            {existingPath ? <p className="truncate">{existingPath}</p> : null}
           </div>
         </div>
       ) : existingPath ? (
-        <p className="text-xs text-muted-foreground">Current path: {existingPath}</p>
+        <p className="text-xs text-muted-foreground">Current image path: {existingPath}</p>
       ) : (
         <p className="text-xs text-muted-foreground">No file selected.</p>
       )}
