@@ -21,6 +21,12 @@ export default function AdminPage() {
           >
             Manage projects
           </Link>
+          <Link
+            href="/admin/artworks"
+            className="ml-3 inline-block border border-border px-4 py-2 text-sm font-medium hover:bg-accent"
+          >
+            Manage artworks
+          </Link>
         </section>
       </div>
     </AdminGuard>
