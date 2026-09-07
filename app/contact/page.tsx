@@ -83,10 +83,10 @@ export default function Contact() {
             </WindowFrame>
 
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <a href={SOCIAL_LINKS.general.x} className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">X</a>
-                    <a href={SOCIAL_LINKS.development.github} className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">GitHub</a>
-                    <a href={SOCIAL_LINKS.art.instagram} className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">Instagram</a>
-                    <a href={SOCIAL_LINKS.art.pixiv} className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">Pixiv</a>
+                    <a href={SOCIAL_LINKS.general.x} target="_blank" rel="noopener noreferrer" className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">X</a>
+                    <a href={SOCIAL_LINKS.development.github} target="_blank" rel="noopener noreferrer" className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">GitHub</a>
+                    <a href={SOCIAL_LINKS.art.instagram} target="_blank" rel="noopener noreferrer" className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">Instagram</a>
+                    <a href={SOCIAL_LINKS.art.pixiv} target="_blank" rel="noopener noreferrer" className="p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all font-mono text-sm uppercase">Pixiv</a>
             </div>
         </div>
     );

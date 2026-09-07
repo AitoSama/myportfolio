@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, ExternalLink, Github, Layers, Tag } from "lucide-react";
 import WindowFrame from "@/components/WindowFrame";
-import { getArtwork, getProject } from "@/lib/data";
+import { getArtwork } from "@/lib/data";
+import { getPublishedProjectBySlug } from "@/lib/data-access/projects";
 
 export default async function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const project = getProject(slug);
+    const project = await getPublishedProjectBySlug(slug);
 
     if (!project) {
         notFound();
@@ -39,13 +40,13 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
                                 <p className="text-lg text-muted-foreground font-light">{project.category}</p>
                             </div>
                             <div className="flex gap-4">
-                                {project.links?.liveDemo ? (
-                                    <a href={project.links.liveDemo} className="bg-black text-white px-6 py-2 font-mono text-xs font-bold uppercase hover:bg-black/80 flex items-center gap-2">Live Demo <ExternalLink className="w-3 h-3" /></a>
+                                {project.liveUrl ? (
+                                    <a href={project.liveUrl} className="bg-black text-white px-6 py-2 font-mono text-xs font-bold uppercase hover:bg-black/80 flex items-center gap-2">Live Demo <ExternalLink className="w-3 h-3" /></a>
                                 ) : (
                                     <span className="bg-gray-300 text-gray-500 px-6 py-2 font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-not-allowed">Live Demo <ExternalLink className="w-3 h-3" /></span>
                                 )}
-                                {project.links?.sourceRepository ? (
-                                    <a href={project.links.sourceRepository} className="border border-black px-6 py-2 font-mono text-xs font-bold uppercase hover:bg-gray-50 flex items-center gap-2">Source <Github className="w-3 h-3" /></a>
+                                {project.sourceUrl ? (
+                                    <a href={project.sourceUrl} className="border border-black px-6 py-2 font-mono text-xs font-bold uppercase hover:bg-gray-50 flex items-center gap-2">Source <Github className="w-3 h-3" /></a>
                                 ) : (
                                     <span className="border border-gray-300 text-gray-500 px-6 py-2 font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-not-allowed">Source <Github className="w-3 h-3" /></span>
                                 )}
@@ -58,7 +59,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
                                 <p className="text-muted-foreground leading-relaxed">{project.description ?? project.shortDescription}</p>
                                 {project.screenshots && project.screenshots.length > 0 && (
                                     <div className="grid gap-4">
-                                        {project.screenshots.map((screenshot) => <Image key={screenshot} src={screenshot} alt={`${project.title} screenshot`} width={1200} height={675} />)}
+                                        {project.screenshots.map((screenshot) => <Image key={screenshot.url} src={screenshot.url} alt={`${project.title} screenshot`} width={1200} height={675} />)}
                                     </div>
                                 )}
                                 {relatedArtwork.length > 0 && <p className="text-muted-foreground">Related artwork is available in the Gallery.</p>}

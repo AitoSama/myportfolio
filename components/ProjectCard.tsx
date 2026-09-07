@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import WindowFrame from "@/components/WindowFrame";
-import type { Project } from "@/lib/data";
+import type { Project } from "@/types/database";
 
 interface ProjectCardProps {
     project: Project;

@@ -3,11 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import WindowFrame from "@/components/WindowFrame";
-import { getArtwork, getProject } from "@/lib/data";
+import { getProject } from "@/lib/data";
+import { getPublishedArtworkBySlug } from "@/lib/data-access/artworks";
+
+export const dynamic = "force-dynamic";
 
 export default async function ArtworkDetail({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const artwork = getArtwork(slug);
+    const artwork = await getPublishedArtworkBySlug(slug);
 
     if (!artwork) {
         notFound();
