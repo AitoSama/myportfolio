@@ -1,0 +1,453 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 1136 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(ARTIST.DEV PROJECT AUDIT RECAP) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(Read-only technical, visual, and UX audit) Tj
+0 -15 Td
+(Audit date: September 6, 2026) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(EXECUTIVE SUMMARY) Tj
+0 -15 Td
+(Artist.Dev is a personal creative portfolio for a frontend developer and UI designer.) Tj
+0 -15 Td
+(It uses a monochrome editorial visual language with anime-inspired artwork, file/window) Tj
+0 -15 Td
+(metaphors, hard borders, offset shadows, monospace metadata, and motion effects.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(The project is an early-stage static portfolio prototype. The browsing structure exists,) Tj
+0 -15 Td
+(but the production build is blocked by a missing image import. Project imagery, social) Tj
+0 -15 Td
+(links, demos, source links, and contact submission are incomplete.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(TECH STACK) Tj
+0 -15 Td
+(Next.js 16 App Router | React 19 | TypeScript | Tailwind CSS v4) Tj
+0 -15 Td
+(Framer Motion | Lucide React | Radix UI Toast and Tooltip | ESLint) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(OVERALL STATUS: EARLY-STAGE PROTOTYPE / PARTIALLY COMPLETE) Tj
+0 -15 Td
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 1293 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(ARCHITECTURE) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(Browser) Tj
+0 -15 Td
+(-> Next.js App Router) Tj
+0 -15 Td
+(-> Root Layout) Tj
+0 -15 Td
+(-> Navigation, TooltipProvider, Toaster) Tj
+0 -15 Td
+(-> Page route) Tj
+0 -15 Td
+(-> WindowFrame, Framer Motion, Lucide icons) Tj
+0 -15 Td
+(-> Static PROJECTS data and local React state) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(There is no backend path: no API, database, authentication, persistence, or server data) Tj
+0 -15 Td
+(fetching. Project data is hardcoded in lib/data.ts. Works filtering uses local state.) Tj
+0 -15 Td
+(Project details use a local slug lookup. Contact copying uses the Clipboard API.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(IMPORTANT FILES) Tj
+0 -15 Td
+(app/layout.tsx Global layout, metadata, fonts, providers) Tj
+0 -15 Td
+(app/page.tsx Home page) Tj
+0 -15 Td
+(app/works/page.tsx Filterable project archive) Tj
+0 -15 Td
+(app/works/[slug]/page.tsx Dynamic project detail) Tj
+0 -15 Td
+(app/about/page.tsx Profile and skills) Tj
+0 -15 Td
+(app/contact/page.tsx Contact UI) Tj
+0 -15 Td
+(components/ Navigation, WindowFrame, UI primitives) Tj
+0 -15 Td
+(hooks/use-toast.ts In-memory toast state) Tj
+0 -15 Td
+(lib/data.ts Static project records) Tj
+0 -15 Td
+(app/globals.css Theme variables and global styles) Tj
+0 -15 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 1236 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(ROUTES AND USER FLOWS) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(/ Introduction, CTAs, social icons, character artwork - PARTIAL) Tj
+0 -15 Td
+(/works Filterable archive of six projects - PARTIAL) Tj
+0 -15 Td
+(/works/[slug] Dynamic project detail - PARTIAL) Tj
+0 -15 Td
+(/about Profile and skills - BROKEN) Tj
+0 -15 Td
+(/contact Email copy and message form - PARTIAL) Tj
+0 -15 Td
+(404 Custom not-found page - PRESENT WITH LINT ISSUES) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(GLOBAL FLOW) Tj
+0 -15 Td
+([Home] -> [Works] -> [Filter] -> [Project Detail]) Tj
+0 -15 Td
+(| -> Back to Works) Tj
+0 -15 Td
+(| -> Live Demo placeholder) Tj
+0 -15 Td
+(| -> Source placeholder) Tj
+0 -15 Td
+(+--> [About] \(blocked by missing asset\)) Tj
+0 -15 Td
+(+--> [Contact] -> Copy email -> Toast) Tj
+0 -15 Td
+(Message form -> preventDefault only) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(COMPLETE: route navigation, filtering, slug matching, unknown-project 404 fallback.) Tj
+0 -15 Td
+(PARTIAL: project browsing, social navigation, detail actions, email copying.) Tj
+0 -15 Td
+(BROKEN: production build and About route due to missing image.) Tj
+0 -15 Td
+(MISSING: contact delivery, real external URLs, mobile navigation, loading/error states.) Tj
+0 -15 Td
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 1441 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(UI AND DESIGN SYSTEM) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(Visual identity: monochrome editorial portfolio with software-window and artist-studio) Tj
+0 -15 Td
+(references. The strongest visual surfaces are Home, Works, and WindowFrame.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(Palette: near-black, off-white, light gray, gray borders, green online status, and a) Tj
+0 -15 Td
+(defined red destructive token.) Tj
+0 -15 Td
+(Typography: CSS declares Inter, Space Grotesk, and JetBrains Mono, while the layout) Tj
+0 -15 Td
+(loads Geist and Geist Mono. This is inconsistent.) Tj
+0 -15 Td
+(Layout: Tailwind containers, six-unit horizontal padding, desktop grids, responsive) Tj
+0 -15 Td
+(stacking at md/lg breakpoints.) Tj
+0 -15 Td
+(Shapes: mostly square controls, thin black borders, offset black shadows, small rounded) Tj
+0 -15 Td
+(window-control dots.) Tj
+0 -15 Td
+(Effects: dotted background, backdrop blur, grayscale images, hover transforms, motion) Tj
+0 -15 Td
+(entrances.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(RESPONSIVE FINDINGS) Tj
+0 -15 Td
+(- Desktop navigation is visible; links disappear below md.) Tj
+0 -15 Td
+(- No mobile menu replaces the hidden navigation.) Tj
+0 -15 Td
+(- Works cards stack on mobile; desktop uses two columns.) Tj
+0 -15 Td
+(- Rotated frames and offset decoration may create narrow-screen overflow.) Tj
+0 -15 Td
+(- No mobile-specific accessibility or interaction strategy is present.) Tj
+0 -15 Td
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 1258 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(FUNCTIONALITY AND ASSETS) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(WORKING) Tj
+0 -15 Td
+(- Navigation structure and active route state) Tj
+0 -15 Td
+(- Works category filtering) Tj
+0 -15 Td
+(- Project slug lookup and unknown-project fallback) Tj
+0 -15 Td
+(- Toast rendering and motion effects) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(PARTIALLY WORKING) Tj
+0 -15 Td
+(- Project archive: data works, images do not.) Tj
+0 -15 Td
+(- Project details: metadata works, external links do not.) Tj
+0 -15 Td
+(- Contact: fields and email copy render, submission does not send.) Tj
+0 -15 Td
+(- Social actions: icons render, destinations are href="#".) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(MISSING ASSETS) Tj
+0 -15 Td
+(- app/assets/images/oc-character.png) Tj
+0 -15 Td
+(- /projects/neural-canvas.jpg) Tj
+0 -15 Td
+(- /projects/pixel-poetry.jpg) Tj
+0 -15 Td
+(- /projects/aurora-studio.jpg) Tj
+0 -15 Td
+(- /projects/retro-arcade.jpg) Tj
+0 -15 Td
+(- /projects/quantum-visualizer.jpg) Tj
+0 -15 Td
+(- /projects/minimalist-blog.jpg) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(PRESENT ASSETS) Tj
+0 -15 Td
+(- public/assets/image/cover-web.png: monochrome anime-style character illustration.) Tj
+0 -15 Td
+(- Starter SVGs and public/projects/placeholder.html appear unused.) Tj
+0 -15 Td
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 1311 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(BUILD EVIDENCE AND RISKS) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(CONFIRMED BUILD BLOCKER - npm run build fails because) Tj
+0 -15 Td
+(app/assets/images/oc-character.png cannot be resolved.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(CONFIRMED TYPE CHECK FAILURE - npx tsc --noEmit reports that the imported) Tj
+0 -15 Td
+(StaticImageData is incompatible with the raw img source type.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(CONFIRMED LINT FAILURE - npm run lint reports five errors and six warnings,) Tj
+0 -15 Td
+(including unescaped apostrophes, a raw anchor to /, an unused icon import,) Tj
+0 -15 Td
+(and raw image warnings.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(P0 CRITICAL) Tj
+0 -15 Td
+(- Production build failure.) Tj
+0 -15 Td
+(- All six project card images are absent.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(P1 HIGH) Tj
+0 -15 Td
+(- Contact form does not send data.) Tj
+0 -15 Td
+(- External links are placeholders.) Tj
+0 -15 Td
+(- Mobile navigation is missing.) Tj
+0 -15 Td
+(- Lint and TypeScript checks fail.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(P2 MEDIUM) Tj
+0 -15 Td
+(- Duplicate WindowFrame under src/components/components.) Tj
+0 -15 Td
+(- Font-token mismatch and weak focus/accessibility states.) Tj
+0 -15 Td
+(- No loading, empty, or error states.) Tj
+0 -15 Td
+(- pattern-dots is referenced but not defined.) Tj
+0 -15 Td
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 1329 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+/F1 15 Tf
+(RECOMMENDED ROADMAP) Tj
+0 -15 Td
+/F1 10 Tf
+() Tj
+0 -15 Td
+(1. Restore or replace the missing About image and resolve the image type/build issue.) Tj
+0 -15 Td
+(2. Add valid project images or update project records to valid assets.) Tj
+0 -15 Td
+(3. Fix TypeScript and ESLint errors.) Tj
+0 -15 Td
+(4. Replace placeholder social, demo, and source links.) Tj
+0 -15 Td
+(5. Choose and implement a real contact delivery path.) Tj
+0 -15 Td
+(6. Add mobile navigation and test narrow-screen overflow.) Tj
+0 -15 Td
+(7. Add form validation, loading, success, and failure states.) Tj
+0 -15 Td
+(8. Consolidate the duplicate WindowFrame and align font configuration.) Tj
+0 -15 Td
+(9. Remove unused dependencies/assets after confirming they are not planned features.) Tj
+0 -15 Td
+(10. Run browser-based responsive and accessibility checks after the build passes.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(FINAL ASSESSMENT) Tj
+0 -15 Td
+(The project has a clear visual direction and a usable portfolio skeleton. It is not) Tj
+0 -15 Td
+(production-ready because the build is broken, core imagery is absent, and the primary) Tj
+0 -15 Td
+(contact and external-project journeys are placeholders.) Tj
+0 -15 Td
+() Tj
+0 -15 Td
+(This recap was generated from a read-only audit. No application source files were changed.) Tj
+0 -15 Td
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 1 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 7 >>
+endobj
+17 0 obj
+<< /Type /Catalog /Pages 16 0 R >>
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000001267 00000 n 
+0000001394 00000 n 
+0000002739 00000 n 
+0000002866 00000 n 
+0000004154 00000 n 
+0000004281 00000 n 
+0000005774 00000 n 
+0000005901 00000 n 
+0000007212 00000 n 
+0000007341 00000 n 
+0000008705 00000 n 
+0000008834 00000 n 
+0000010216 00000 n 
+0000010345 00000 n 
+0000010442 00000 n 
+trailer
+<< /Size 18 /Root 17 0 R >>
+startxref
+10493
+%%EOF

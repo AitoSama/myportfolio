@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'a1t0samatt@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function isValidProject(projectId) {
+      return request.resource.data.title is string
+        && request.resource.data.slug is string
+        && request.resource.data.slug == projectId
+        && request.resource.data.status in ['published', 'draft', 'archived'];
+    }
+
+    function isValidArtwork(artworkId) {
+      return request.resource.data.title is string
+        && request.resource.data.slug is string
+        && request.resource.data.slug == artworkId
+        && request.resource.data.status in ['published', 'draft', 'archived']
+        && request.resource.data.format in [
+          'Headshot',
+          'Half Body',
+          'Full Body',
+          'Illustration',
+          'Sticker',
+          'Sketch'
+        ]
+        && request.resource.data.type in [
+          'Original',
+          'Fan Art',
+          'Commission',
+          'Adoptable',
+          'Commercial'
+        ];
+    }
+
+    match /projects/{projectId} {
+      // Public queries must include where('status', '==', 'published').
+      // Rules are not filters, so an unconstrained query will be rejected.
+      allow read: if resource.data.status == 'published';
+      allow create, update: if isAdmin() && isValidProject(projectId);
+      allow delete: if isAdmin();
+    }
+
+    match /artworks/{artworkId} {
+      // Public queries must include where('status', '==', 'published').
+      // Rules are not filters, so an unconstrained query will be rejected.
+      allow read: if resource.data.status == 'published';
+      allow create, update: if isAdmin() && isValidArtwork(artworkId);
+      allow delete: if isAdmin();
+    }
+
+    match /profile/{profileId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /socialLinks/{socialLinkId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}

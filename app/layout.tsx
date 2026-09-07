@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Artist.Dev - Frontend Developer & UI Designer",
+    title: "A1T0 - Thongphout Maneevong",
     description: "Portfolio of a multidisciplinary creative specializing in frontend development and UI design.",
 };
 

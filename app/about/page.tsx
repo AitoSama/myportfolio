@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import WindowFrame from "@/components/WindowFrame";
-import ocImage from "@/app/assets/images/oc-character.png";
+import Image from "next/image";
+import { PROFILE } from "@/lib/data";
 
 export default function About() {
     return (
@@ -15,9 +16,11 @@ export default function About() {
                 >
                     <WindowFrame title="profile.jpg" className="w-full">
                         <div className="aspect-[3/4] overflow-hidden bg-gray-50 relative">
-                            <img
-                                src={ocImage}
+                            <Image
+                                src="/assets/image/cover-web.png"
                                 alt="Artist Profile"
+                                fill
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 className="w-full h-full object-cover grayscale opacity-90"
                             />
                             <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent text-white">
@@ -34,10 +37,11 @@ export default function About() {
                     className="space-y-8"
                 >
                     <div>
+                        <p className="font-mono text-sm uppercase text-muted-foreground mb-2">{PROFILE.brand} / {PROFILE.name}</p>
                         <h1 className="text-4xl font-heading font-bold mb-6">BEHIND THE SCREEN</h1>
                         <div className="space-y-4 text-lg leading-relaxed text-muted-foreground">
                             <p>
-                                Hello. I'm a multidisciplinary creative based in the digital realm. My work exists at the intersection of logical code and expressive design.
+                                {PROFILE.bio} {PROFILE.name} works across development, frontend, UI/UX, creative technology, and digital art.
                             </p>
                             <p>
                                 Unlike traditional developers who focus solely on function, I treat every project as an interactive canvas. I believe software should have personality—a digital soul that resonates with its user.

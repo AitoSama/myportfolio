@@ -3,9 +3,11 @@
 
 import { motion } from "framer-motion";
 import WindowFrame from "@/components/WindowFrame";
-import ocImage from "@/app/assets/images/oc-character.png";
+import Image from "next/image";
+
 import { ArrowRight, Mail, Github, Twitter } from "lucide-react";
 import Link from "next/link";
+import { CONTACT, PROFILE, PROJECTS, SOCIAL_LINKS } from "@/lib/data";
 
 export default function Home() {
     return (
@@ -21,7 +23,7 @@ export default function Home() {
                 >
                     <div className="space-y-4">
                         <h2 className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
-                            Frontend Developer & UI Designer
+                            {PROFILE.headline}
                         </h2>
                         <h1 className="text-5xl md:text-7xl font-heading font-bold tracking-tighter leading-tight">
                             Crafting digital <br />
@@ -29,7 +31,7 @@ export default function Home() {
                             soul & precision.
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-xl leading-relaxed">
-                            I blend technical expertise with artistic vision to build websites that feel like interactive art pieces.
+                            {PROFILE.bio}
                         </p>
                     </div>
 
@@ -44,9 +46,9 @@ export default function Home() {
                     </div>
 
                     <div className="flex gap-6 pt-8 border-t border-border w-fit">
-                        <a href="#" className="hover:text-black/60 transition-colors"><Github className="w-5 h-5" /></a>
-                        <a href="#" className="hover:text-black/60 transition-colors"><Twitter className="w-5 h-5" /></a>
-                        <a href="#" className="hover:text-black/60 transition-colors"><Mail className="w-5 h-5" /></a>
+                        <a href={SOCIAL_LINKS.development.github} title="GitHub" aria-label="GitHub" className="hover:text-black/60 transition-colors"><Github className="w-5 h-5" /></a>
+                        <a href={SOCIAL_LINKS.general.x} title="X" aria-label="X" className="hover:text-black/60 transition-colors"><Twitter className="w-5 h-5" /></a>
+                        <a href={`mailto:${CONTACT.publicEmail}`} title="Email A1T0" aria-label="Email A1T0" className="hover:text-black/60 transition-colors"><Mail className="w-5 h-5" /></a>
                     </div>
                 </motion.div>
 
@@ -57,9 +59,11 @@ export default function Home() {
                     className="lg:col-span-5 relative"
                 >
                     <WindowFrame title="character_sheet.png" className="w-full aspect-[4/5] bg-white overflow-hidden rotate-1 hover:rotate-0 transition-transform duration-500">
-                        <img
-                            src={ocImage}
+                        <Image
+                            src="/assets/image/cover-web.png"
                             alt="Anime Character Illustration"
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 42vw"
                             className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                         />
 
@@ -68,7 +72,7 @@ export default function Home() {
                             <div className="flex justify-between items-center">
                                 <span className="font-bold">STATUS</span>
                                 <span className="text-green-600 animate-pulse">● ONLINE</span>
-                            </div> 
+                            </div>
                             <div className="mt-2 h-1 w-full bg-gray-200">
                                 <div className="h-full bg-black w-[75%]" />
                             </div>
@@ -76,9 +80,24 @@ export default function Home() {
                     </WindowFrame>
 
                     {/* Decorative elements */}
-                    <div className="absolute -z-10 top-10 -right-10 w-full h-full border border-black/20 pattern-dots" />
+                    <div className="absolute -z-10 top-10 right-0 md:-right-10 w-full h-full border border-black/20 pattern-dots" />
                 </motion.div>
             </div>
+            <section className="mt-16 border-t border-border pt-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="font-mono text-sm uppercase tracking-widest">Selected Work</h2>
+                    <Link href="/works" className="font-mono text-xs uppercase underline underline-offset-4">Open Works</Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {PROJECTS.slice(0, 3).map((project) => (
+                        <Link key={project.id} href={`/works/projects/${project.slug}`} className="border border-black bg-white p-4 hover:bg-gray-50 transition-colors">
+                            <span className="font-mono text-xs text-muted-foreground">{project.date}</span>
+                            <h3 className="font-bold mt-2">{project.title}</h3>
+                            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{project.shortDescription}</p>
+                        </Link>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }

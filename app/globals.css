@@ -4,9 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-sans: 'Inter', sans-serif;
-    --font-heading: 'Space Grotesk', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: var(--font-geist-sans), sans-serif;
+    --font-heading: var(--font-geist-sans), sans-serif;
+    --font-mono: var(--font-geist-mono), monospace;
 
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
@@ -145,5 +145,10 @@
 @layer utilities {
     .text-shadow-sm {
         text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+    }
+
+    .pattern-dots {
+        background-image: radial-gradient(#111 1px, transparent 1px);
+        background-size: 12px 12px;
     }
 }

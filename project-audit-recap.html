@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Artist.Dev Project Audit Recap</title>
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+:root { color: #171717; background: #fff; font-family: Arial, Helvetica, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.45; font-size: 10.5pt; }
+h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; line-height: 1.12; }
+h1 { font-size: 30pt; margin: 0 0 8px; }
+h2 { font-size: 17pt; border-bottom: 2px solid #171717; padding-bottom: 4px; margin: 24px 0 10px; break-after: avoid; }
+h3 { font-size: 12pt; margin: 14px 0 4px; break-after: avoid; }
+p { margin: 5px 0 8px; }
+ul { margin: 5px 0 10px; padding-left: 19px; }
+li { margin: 2px 0; }
+.cover { min-height: 235mm; display: flex; flex-direction: column; justify-content: center; border-top: 12px solid #171717; }
+.kicker { font: bold 9pt monospace; letter-spacing: 2px; text-transform: uppercase; color: #666; }
+.subtitle { font-size: 14pt; color: #555; max-width: 520px; }
+.meta { margin-top: 35px; border-top: 1px solid #aaa; padding-top: 10px; font-family: monospace; font-size: 9pt; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+.box { border: 1px solid #aaa; padding: 9px 11px; margin: 8px 0; break-inside: avoid; }
+.status { font-family: monospace; font-size: 8.5pt; font-weight: bold; letter-spacing: .5px; }
+.critical { border-left: 5px solid #b00020; }
+.high { border-left: 5px solid #d47700; }
+.medium { border-left: 5px solid #777; }
+code { font-family: Consolas, monospace; font-size: 9pt; background: #f1f1f1; padding: 1px 3px; }
+pre { background: #f4f4f4; border: 1px solid #ddd; padding: 10px; font: 8.5pt/1.4 Consolas, monospace; white-space: pre-wrap; break-inside: avoid; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 9.5pt; break-inside: avoid; }
+th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #ccc; padding: 5px 6px; }
+th { background: #f0f0f0; }
+.small { color: #666; font-size: 9pt; }
+.page-break { break-before: page; }
+footer { margin-top: 25px; border-top: 1px solid #aaa; padding-top: 6px; color: #666; font-size: 8pt; }
+</style>
+</head>
+<body>
+<section class="cover">
+  <div class="kicker">Technical + Visual + UX Map</div>
+  <h1>Artist.Dev<br>Project Audit Recap</h1>
+  <p class="subtitle">Read-only discovery of the current Next.js portfolio project, including architecture, routes, user flows, design system, assets, functionality, and technical risk.</p>
+  <div class="meta">Audit date: September 6, 2026<br>Repository: portfolio<br>Change policy: no source files modified</div>
+</section>
+
+<h2>1. Executive Summary</h2>
+<p>Artist.Dev is a personal creative portfolio for a frontend developer and UI designer. It uses a monochrome editorial visual language with anime-inspired artwork, file/window metaphors, hard borders, offset shadows, monospace metadata, and motion effects.</p>
+<p>The project is an early-stage static portfolio prototype. The main browsing structure exists, but the production build is currently blocked by a missing image import. Project imagery, social links, demos, source links, and contact submission are incomplete.</p>
+<div class="grid">
+  <div class="box"><b>Framework</b><br>Next.js 16 App Router, React 19, TypeScript</div>
+  <div class="box"><b>Rendering model</b><br>Client components with static local data</div>
+  <div class="box"><b>Backend</b><br>None detected: no API, database, auth, or persistence</div>
+  <div class="box"><b>Overall status</b><br>Early-stage prototype / partially complete</div>
+</div>
+
+<h2>2. Architecture</h2>
+<pre>Browser
+  |
+  v
+Next.js App Router
+  |
+  +--> Root Layout
+  |      +--> Navigation
+  |      +--> TooltipProvider
+  |      +--> Toaster
+  |
+  +--> Page route
+         +--> WindowFrame
+         +--> Framer Motion
+         +--> Lucide icons
+         +--> Static PROJECTS data
+         +--> Local React state</pre>
+<p>Data is hardcoded in <code>lib/data.ts</code>. Works filtering uses local state. Project details use a local slug lookup. Contact copying uses the browser Clipboard API. No server data flow exists.</p>
+
+<h2>3. Routes</h2>
+<table><tr><th>Route</th><th>Purpose</th><th>Status</th></tr>
+<tr><td>/</td><td>Introduction, CTA links, social icons, character artwork</td><td>Partial</td></tr>
+<tr><td>/works</td><td>Filterable archive of six projects</td><td>Partial; images missing</td></tr>
+<tr><td>/works/[slug]</td><td>Dynamic project detail view</td><td>Partial; links/images placeholders</td></tr>
+<tr><td>/about</td><td>Profile and skill lists</td><td>Broken; missing image import</td></tr>
+<tr><td>/contact</td><td>Email copy and message form</td><td>Partial; form does not submit</td></tr>
+<tr><td>404</td><td>Custom not-found page</td><td>Present; lint issues</td></tr></table>
+<p>No protected routes, nested layouts, loading routes, API routes, or role-specific flows were found.</p>
+
+<h2>4. User Flow Map</h2>
+<pre>[Home]
+  +--> [Works] --> [Filter] --> [Project Detail]
+  |                              +--> Back to Works
+  |                              +--> Live Demo placeholder
+  |                              +--> Source placeholder
+  +--> [About] (currently blocked by missing asset)
+  +--> [Contact] --> [Copy email] --> [Toast]
+                    +--> [Message form] --> preventDefault only</pre>
+<h3>Flow status</h3>
+<ul><li><b>Complete:</b> route navigation, project filtering, known/unknown project lookup, custom 404.</li><li><b>Partial:</b> project browsing, social navigation, project detail actions, email copying.</li><li><b>Broken:</b> production build and About route due to missing <code>app/assets/images/oc-character.png</code>.</li><li><b>Missing:</b> contact delivery, real external URLs, mobile navigation, loading/error/empty states.</li></ul>
+
+<h2>5. UI and Design System</h2>
+<ul><li><b>Palette:</b> near-black, off-white, light gray, gray borders, with green online status and a defined red destructive token.</li><li><b>Typography:</b> CSS declares Inter, Space Grotesk, and JetBrains Mono, while the layout loads Geist and Geist Mono. This is inconsistent.</li><li><b>Layout:</b> Tailwind containers, six-unit horizontal padding, desktop grids, responsive stacking at md/lg breakpoints.</li><li><b>Shapes:</b> mostly square controls, thin black borders, offset black shadows, small rounded window-control dots.</li><li><b>Effects:</b> dotted background, backdrop blur, grayscale image effects, hover transforms, Framer Motion entrances.</li><li><b>Identity:</b> monochrome editorial portfolio with software-window and artist-studio references.</li></ul>
+<p>The visual direction is intentional and strongest on Home, Works, and the shared WindowFrame component. It becomes less complete around functional controls and missing assets.</p>
+
+<h2>6. Components and Dependencies</h2>
+<h3>Active components</h3>
+<ul><li><code>Navigation</code>: fixed header with pathname-based active state; desktop-only links.</li><li><code>WindowFrame</code>: shared file/window presentation wrapper used across the main pages.</li><li><code>Toaster</code> and Radix toast primitives: used by the clipboard confirmation.</li><li><code>TooltipProvider</code>: mounted globally, but no tooltip usage was found.</li></ul>
+<h3>Maintenance findings</h3>
+<ul><li>A duplicate WindowFrame exists under <code>src/components/components/WindowFrame.tsx</code> and appears unused.</li><li>Many Radix packages are declared but have no direct source imports: accordion, alert dialog, aspect ratio, avatar, checkbox, dialog, dropdown menu, label, popover, select, separator, and slot.</li><li>Starter SVG assets and a placeholder HTML project asset appear unused.</li></ul>
+
+<h2>7. Assets and Build Evidence</h2>
+<ul><li>One real image exists: <code>public/assets/image/cover-web.png</code>, a monochrome anime-style character illustration used on Home.</li><li>The About page imports the absent <code>app/assets/images/oc-character.png</code>.</li><li>All six project image paths in <code>lib/data.ts</code> point to absent <code>/projects/*.jpg</code> files.</li><li><code>public/oc/</code> and <code>app/assets/images/</code> are empty.</li></ul>
+<div class="box critical"><span class="status">CONFIRMED BUILD BLOCKER</span><br><code>npm run build</code> fails because <code>oc-character.png</code> cannot be resolved.</div>
+<div class="box high"><span class="status">CONFIRMED TYPE CHECK FAILURE</span><br><code>npx tsc --noEmit</code> reports that the imported image data is incompatible with the raw <code>&lt;img&gt;</code> source type.</div>
+<div class="box high"><span class="status">CONFIRMED LINT FAILURE</span><br><code>npm run lint</code> reports five errors and six warnings, including unescaped apostrophes, a raw anchor to <code>/</code>, an unused icon import, and raw image warnings.</div>
+
+<h2>8. Functionality Status</h2>
+<table><tr><th>Category</th><th>Findings</th></tr>
+<tr><td>Working</td><td>Navigation structure, Works filters, slug matching, unknown-project 404 fallback, toast rendering, motion effects.</td></tr>
+<tr><td>Partial</td><td>Project archive, detail pages, email copying, responsive layouts, social actions.</td></tr>
+<tr><td>Broken</td><td>Production build, About page, project image rendering.</td></tr>
+<tr><td>Missing</td><td>Contact delivery, external project URLs, real social profiles, mobile menu, validation, loading and error states.</td></tr>
+</table>
+
+<h2>9. Prioritized Risks</h2>
+<div class="box critical"><b>P0 - Critical</b><br>Production build fails due to missing About image import. All six project card images are absent.</div>
+<div class="box high"><b>P1 - High</b><br>Contact form does not send data. External links are placeholders. Mobile navigation disappears below md with no replacement. Lint and TypeScript checks fail.</div>
+<div class="box medium"><b>P2 - Medium</b><br>Duplicate WindowFrame, font-token mismatch, weak focus/accessibility states, no loading/empty/error states, undefined <code>pattern-dots</code> utility, generic repeated project detail copy.</div>
+<div class="box"><b>P3 - Low</b><br>Unused starter assets, unused dependency surface, unused tooltip infrastructure, and an unusually long toast removal delay.</div>
+
+<h2>10. Recommended Roadmap</h2>
+<ol>
+<li>Restore or replace the missing About image and resolve the image type/build issue.</li>
+<li>Add valid project images or update the project records to valid assets.</li>
+<li>Fix TypeScript and ESLint errors.</li>
+<li>Replace placeholder social, demo, and source links with real destinations.</li>
+<li>Choose and implement a real contact delivery path.</li>
+<li>Add mobile navigation and test narrow-screen overflow.</li>
+<li>Add form validation, loading, success, and failure states.</li>
+<li>Consolidate the duplicate WindowFrame and align the font configuration.</li>
+<li>Remove unused dependencies/assets after confirming they are not planned features.</li>
+<li>Run browser-based responsive and accessibility checks once the build passes.</li>
+</ol>
+<footer>Generated from a read-only audit of the current repository. No project source files were changed.</footer>
+</body>
+</html>

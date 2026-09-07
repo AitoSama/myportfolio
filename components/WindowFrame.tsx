@@ -18,7 +18,7 @@ export default function WindowFrame({ title = "Untitled", children, className }:
                     <div className="w-2.5 h-2.5 rounded-full border border-black bg-white hover:bg-black transition-colors" />
                 </div>
             </div>
-            <div className="p-0 bg-white">
+            <div className="relative h-full p-0 bg-white">
                 {children}
             </div>
         </div>
