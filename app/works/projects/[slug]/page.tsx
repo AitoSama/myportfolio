@@ -5,14 +5,17 @@ import { ArrowLeft, Calendar, ExternalLink, Github, Layers, Tag } from "lucide-r
 import WindowFrame from "@/components/WindowFrame";
 import { getArtwork } from "@/lib/data";
 import { getPublishedProjectBySlug } from "@/lib/data-access/projects";
+import { resolveProjectMedia } from "@/lib/public-media";
 
 export default async function ProjectDetail({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const project = await getPublishedProjectBySlug(slug);
+    const projectRecord = await getPublishedProjectBySlug(slug);
 
-    if (!project) {
+    if (!projectRecord) {
         notFound();
     }
+
+    const project = await resolveProjectMedia(projectRecord, ["image"]);
 
     const relatedArtwork = (project.relatedArtwork ?? [])
         .map((artworkSlug) => getArtwork(artworkSlug))
@@ -27,8 +30,8 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
             <div>
                 <WindowFrame title={`${project.title} - READ_ONLY`} className="mb-12">
                     <div className="aspect-video w-full bg-gray-100 border-b border-black relative">
-                        {project.thumbnail ? (
-                            <Image src={project.thumbnail} alt={project.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-cover" />
+                        {project.resolvedImageUrl ? (
+                            <Image src={project.resolvedImageUrl} alt={project.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center font-mono text-xs uppercase text-gray-500">Image unavailable</div>
                         )}

@@ -6,10 +6,10 @@ import { ArrowRight, Mail, Github, Twitter } from "lucide-react";
 import Link from "next/link";
 import WindowFrame from "@/components/WindowFrame";
 import { CONTACT, PROFILE, SOCIAL_LINKS } from "@/lib/data";
-import type { Project } from "@/types/database";
+import type { ResolvedProject } from "@/lib/public-media";
 
 interface HomeContentProps {
-    projects: Project[];
+    projects: ResolvedProject[];
     projectsUnavailable: boolean;
 }
 

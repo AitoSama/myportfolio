@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import ProjectCard from "@/components/ProjectCard";
 import WindowFrame from "@/components/WindowFrame";
-import type { Project } from "@/types/database";
+import type { ResolvedProject } from "@/lib/public-media";
 
 interface ProjectsContentProps {
-    projects: Project[];
+    projects: ResolvedProject[];
     projectsUnavailable: boolean;
 }
 

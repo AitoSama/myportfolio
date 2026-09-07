@@ -1,16 +1,19 @@
+import Image from "next/image";
 import Link from "next/link";
 import WindowFrame from "@/components/WindowFrame";
 import { getPublishedArtworks } from "@/lib/data-access/artworks";
-import type { Artwork } from "@/types/database";
+import { resolveArtworkMedia, type ResolvedArtwork } from "@/lib/public-media";
 
 export const dynamic = "force-dynamic";
 
 export default async function Gallery() {
-    let artworks: Artwork[] = [];
+    let artworks: ResolvedArtwork[] = [];
     let artworksUnavailable = false;
 
     try {
-        artworks = await getPublishedArtworks();
+        artworks = await getPublishedArtworks().then((items) =>
+            Promise.all(items.map((item) => resolveArtworkMedia(item, ["thumbnail"]))),
+        );
     } catch (error) {
         console.error("Loading public artworks failed:", error);
         artworksUnavailable = true;
@@ -43,6 +46,21 @@ export default async function Gallery() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {artworks.map((artwork) => (
                         <Link key={artwork.slug} href={`/works/gallery/${artwork.slug}`} className="block border border-black p-6">
+                            <div className="relative mb-5 aspect-video overflow-hidden bg-gray-100">
+                                {artwork.resolvedThumbnailUrl ? (
+                                    <Image
+                                        src={artwork.resolvedThumbnailUrl}
+                                        alt={artwork.title}
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center font-mono text-xs uppercase text-gray-500">
+                                        Image unavailable
+                                    </div>
+                                )}
+                            </div>
                             <h2 className="font-bold text-xl">{artwork.title}</h2>
                             <p className="font-mono text-xs uppercase text-muted-foreground mt-2">{artwork.format} / {artwork.type}</p>
                         </Link>

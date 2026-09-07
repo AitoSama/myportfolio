@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import WindowFrame from "@/components/WindowFrame";
-import type { Project } from "@/types/database";
+import type { ResolvedProject } from "@/lib/public-media";
 
 interface ProjectCardProps {
-    project: Project;
+    project: ResolvedProject;
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
@@ -12,9 +12,9 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <Link href={`/works/projects/${project.slug}`} className="block h-full">
             <WindowFrame title={`${project.title}.exe`} className="h-full flex flex-col group cursor-pointer hover:shadow-xl transition-shadow">
                 <div className="aspect-video bg-gray-100 overflow-hidden border-b border-black relative">
-                    {project.thumbnail ? (
+                    {project.resolvedThumbnailUrl ? (
                         <Image
-                            src={project.thumbnail}
+                            src={project.resolvedThumbnailUrl}
                             alt={project.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 50vw"

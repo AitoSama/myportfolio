@@ -5,16 +5,19 @@ import { ArrowLeft } from "lucide-react";
 import WindowFrame from "@/components/WindowFrame";
 import { getProject } from "@/lib/data";
 import { getPublishedArtworkBySlug } from "@/lib/data-access/artworks";
+import { resolveArtworkMedia } from "@/lib/public-media";
 
 export const dynamic = "force-dynamic";
 
 export default async function ArtworkDetail({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const artwork = await getPublishedArtworkBySlug(slug);
+    const artworkRecord = await getPublishedArtworkBySlug(slug);
 
-    if (!artwork) {
+    if (!artworkRecord) {
         notFound();
     }
+
+    const artwork = await resolveArtworkMedia(artworkRecord, ["image"]);
 
     const relatedProjects = (artwork.relatedProjects ?? [])
         .map((projectSlug) => getProject(projectSlug))
@@ -28,7 +31,7 @@ export default async function ArtworkDetail({ params }: { params: Promise<{ slug
             <div>
                 <WindowFrame title={`${artwork.title} - ARTWORK`}>
                     <div className="aspect-video w-full bg-gray-100 border-b border-black relative">
-                        {artwork.image ? <Image src={artwork.image} alt={artwork.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-contain" /> : <div className="w-full h-full flex items-center justify-center font-mono text-xs uppercase text-gray-500">Image unavailable</div>}
+                        {artwork.resolvedImageUrl ? <Image src={artwork.resolvedImageUrl} alt={artwork.title} fill sizes="(max-width: 768px) 100vw, 1024px" className="object-contain" /> : <div className="w-full h-full flex items-center justify-center font-mono text-xs uppercase text-gray-500">Image unavailable</div>}
                     </div>
                     <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div className="md:col-span-2 space-y-6">
